@@ -1,0 +1,7 @@
+*
+!.gitignore
+
+!Makefile
+!*.openapi.yaml
+!*.ruleset.yaml
+!*.ignore.yaml

@@ -1,0 +1,255 @@
+openapi: 3.2.0
+info:
+  title: FurRIT Web API
+  version: 0.1.0
+  contact:
+    name: FurRIT Sysadmins
+    email: help@furrit.us
+    url: https://furrit.us
+  license:
+    name: GNU General Public License v3.0 or later
+    identifier: GPL-3.0-or-later
+  description: |-
+    Machine-readable definitions for FurRIT's frontend web routes.
+servers:
+  - url: https://furrit.us
+    description: FurRIT Production Host.
+tags:
+  - name: auths
+    description: Static pages that deal with authentication.
+  - name: events
+    description: Static pages that deal with event information.
+  - name: statics
+    description: Static pages that serve static information.
+  - name: users
+    description: Static pages that deal with user information.
+  - name: registers
+    description: Static pages that deal with registration.
+  - name: logged-out
+    description: Page is ONLY accessible to logged-out users.
+  - name: logged-in
+    description: Page is ONLY accessible to logged-in users.
+  - name: logged-any
+    description: Page is accessible to logged-{in,out} users.
+paths:
+  /:
+    get:
+      summary: Gets the root page.
+      tags:
+        - statics
+        - logged-out
+      operationId: getRoot
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /about:
+    get:
+      summary: Gets the about page.
+      tags:
+        - statics
+        - logged-in
+      operationId: getAbout
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /privacy-policy:
+    get:
+      summary: Gets the privacy policy page.
+      tags:
+        - statics
+        - logged-any
+      operationId: getPrivacyPolicy
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /login:
+    get:
+      summary: Gets the login page.
+      tags:
+        - auths
+        - logged-out
+      operationId: getLogin
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /forgot-password:
+    get:
+      summary: Gets the forgot password page.
+      tags:
+        - auths
+        - logged-out
+      operationId: getForgotPassword
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /register:
+    get:
+      summary: Gets the register page.
+      tags:
+        - registers
+        - logged-out
+      operationId: getRegister
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /register/verify:
+    get:
+      summary: Gets the registration verification page.
+      tags:
+        - registers
+        - logged-out
+      operationId: getVerifyRegister
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /users:
+    get:
+      summary: Gets the user listing page.
+      tags:
+        - users
+        - logged-in
+      operationId: getUserListing
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /user/me:
+    get:
+      summary: Gets your user information page.
+      description: |-
+        Gets the user information page for the currently logged in user.
+      tags:
+        - users
+        - logged-in
+      operationId: getMyUserInfo
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /user/{userId}:
+    parameters:
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Identifier of the user to get.
+    get:
+      summary: Gets the user information page.
+      tags:
+        - users
+        - logged-in
+      operationId: getUserInfo
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /events:
+    get:
+      summary: Gets the event listing page.
+      tags:
+        - events
+        - logged-in
+      operationId: getEventListing
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /event/{eventId}:
+    parameters:
+      - in: path
+        name: eventId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Identifier of the event to get.
+    get:
+      summary: Gets the event information page.
+      tags:
+        - events
+        - logged-in
+      operationId: getEventInfo
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    HtmlPage:
+      description: A successful HTML page.
+      content:
+        text/html:
+          schema:
+            type: string
+            format: html
+    MovedPermanentlyError:
+      description: Moved Permanently.
+    TooManyRequestsError:
+      description: Too Many Requests.
+    InternalServerError:
+      description: Internal Server Error.

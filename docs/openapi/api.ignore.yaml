@@ -1,0 +1,35 @@
+owasp-protection-global-unsafe:
+  # An unauthenticated User must be able to login.
+  - $.paths['/session'].post
+  # An unauthenticated User must be able to register.
+  - $.paths['/registration'].post
+  - $.paths['/registration/{registrationId}/verify'].post
+
+owasp-protection-global-unsafe-strict:
+  # An unauthenticated User must be able to login.
+  - $.paths['/session'].post
+  # An unauthenticated User must be able to register.
+  - $.paths['/registration'].post
+  - $.paths['/registration/{registrationId}/verify'].post
+
+owasp-string-limit:
+  # Already has a .format.
+  - $.components.schemas['PaginationCursor']
+
+description-duplication:
+  # Don't want to add a parameter schema for query.
+  - $.paths['/events'].get.parameters['description']
+
+oas3-valid-schema-example:
+  # We know from manual analysis that this is valid.
+  - $.paths['/events'].get.responses['200'].content['application/json'].schema.examples[0]
+  # "
+  - $.paths['/event/{eventId}'].get.responses['200'].content['application/json'].schema.examples[0]
+  # "
+  - $.paths['/event/{eventId}'].patch.responses['200'].content['application/json'].schema.examples[0]
+
+oas3-missing-example:
+  # Can't provide an exanple of a file upload.
+  - $.paths['/user/{userId}/profile-picture'].put.requestBody.content['multipart/form-data']
+  # "
+  - $.paths['/user/{userId}/profile-picture'].put.requestBody.content['multipart/form-data'].schema.properties['media']

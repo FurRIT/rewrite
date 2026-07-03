@@ -1,0 +1,1211 @@
+openapi: 3.2.0
+info:
+  title: FurRIT API
+  version: 0.1.0
+  contact:
+    name: FurRIT Sysadmins
+    email: help@furrit.us
+    url: https://furrit.us
+  license:
+    name: GNU General Public License v3.0 or later
+    identifier: GPL-3.0-or-later
+  description: |-
+    Machine-readable definitions for FurRIT's frontend web routes.
+servers:
+  - url: https://furrit.us/api
+    description: FurRIT Production Host.
+tags:
+  - name: registrations
+    description: Registration management endpoints.
+  - name: sessions
+    description: Session management endpoints.
+  - name: infos
+    description: Static information endpoints.
+  - name: users
+    description: User search and management endpoints.
+  - name: events
+    description: Event search and management endpoints.
+  - name: rsvps
+    description: Event RSVP fetch and management endpoints.
+security:
+  - session: []
+paths:
+  /session:
+    post:
+      summary: Create a new User Session.
+      tags:
+        - sessions
+      security: []
+      operationId: createSession
+      description: |-
+        Authenticate a User by the passed authentication credentials and create
+        a new User Session if they are valid.
+      requestBody:
+        description: User authentication credentials.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "someguy0"
+                  format: "^.*$"
+                password:
+                  type: string
+                  example: "password123!"
+                  format: password
+              required:
+                - username
+                - password
+      responses:
+        "201":
+          description: A Session was created.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                format: cookie
+                # 128 bits = 16 bytes = 32 hex of entropy
+                example: __Host-Http-furrit_session_id=d3bf4061e84d767a17967083b1b4866c; HttpOnly; Secure; Path=/; Max-Age=1209600
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: Provided credentials are invalid.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /session/self:
+    delete:
+      summary: Delete the active User Session.
+      tags:
+        - sessions
+      operationId: deleteSession
+      description: |-
+        Delete the User Session being used to make the request.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      responses:
+        "200":
+          description: The Session was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /registration:
+    post:
+      summary: Create a new Registration.
+      tags:
+        - registrations
+      security: []
+      operationId: createRegistration
+      description: |-
+        Create a Registration for a new User. To prevent IDOR this endpoint
+        will always return a success if the request is syntactically and
+        semantically valid.
+      requestBody:
+        description: User registration parameters.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ritUsername:
+                  type: string
+                  example: "sag2234"
+                  format: "[a-z]+[0-9]+"
+              required:
+                - ritUsername
+      responses:
+        "201":
+          description: A Registration was created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /registration/{registrationId}/verify:
+    parameters:
+      - in: path
+        name: registrationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Registration Identifier.
+    post:
+      summary: Verify an existing registration.
+      tags:
+        - registrations
+      security: []
+      operationId: verifyRegistration
+      description: |-
+        Verify an existing Registration to create a new User.
+      requestBody:
+        description: Registration verification parameters.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  format: password
+                  # Assuming we use 64 bits of random data - 128 nibbles =
+                  # 128 hex characters
+                  example: "9891d1268feef7890424b173e07ad78c63f6ed5a52a5d48100f5fe093ec52040935aa445cf8f27397694a634063e5312f548b52717b9bdd6608886d6987f6374"
+              required:
+                - code
+      responses:
+        "200":
+          description: A User was created; return a Session.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                format: cookie
+                # 128 bits = 16 bytes = 32 hex of entropy
+                example: __Host-Http-furrit_session_id=d3bf4061e84d767a17967083b1b4866c; HttpOnly; Secure; Path=/; Max-Age=1209600
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+          x-err-condition: Registration has already been verified with that code.
+        "422":
+          $ref: "#/components/responses/UnprocessableContentError"
+          x-err-condition: Verification code has expired; even if registration succeeded.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /degrees:
+    get:
+      summary: Get a list of RIT degrees.
+      tags:
+        - infos
+      operationId: getDegrees
+      description: |-
+        Get a listing of recognized RIT degree names.
+      responses:
+        "200":
+          description: The collection of recognized degrees.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      degrees:
+                        type: array
+                        items:
+                          type: string
+                          format: ".+"
+                    required:
+                      - degrees
+                    examples:
+                      - degrees:
+                          - "Software Engineering BS"
+                          - "Artificial Intelligence MS"
+                examples:
+                  - ok: true
+                    degrees:
+                      - "Software Engineering BS"
+                      - "Artificial Intelligence MS"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /users:
+    get:
+      summary: Get a listing of Users.
+      tags:
+        - users
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: keyword
+          schema:
+            type: string
+            format: ".*"
+          required: false
+          description: Text search query.
+      description: |-
+        Get a listing of Users based off of an optional query.
+      responses:
+        "200":
+          description: The collection of Users.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/SparseUser"
+                    required:
+                      - users
+                examples:
+                  - ok: true
+                    users:
+                      - id: "5f3bdd7a-c346-4a26-9754-97cadfaacaca"
+                        name: "Mr. Wolfy"
+                        degrees:
+                          - "Software Engineering BS"
+                        class: 2025
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /user/{userId}:
+    parameters:
+      - in: path
+        name: userId
+        schema:
+          oneOf:
+            - type: string
+              const: "me"
+            - type: string
+              format: uuid
+        required: true
+        description: User Identifier.
+    get:
+      summary: Get details of a User.
+      tags:
+        - users
+      operationId: getUser
+      description: |-
+        Get detailed information about a User.
+      responses:
+        "200":
+          description: The User details.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      user:
+                        $ref: "#/components/schemas/DetailedUserWithConnections"
+                    required:
+                      - user
+                examples:
+                  - ok: true
+                    user:
+                      # SparseUserInfo: ...
+                      id: "174872b8-a166-4a41-8f67-c682774a34d2"
+                      name: "Mr. Wolfy"
+                      degrees:
+                        - "Software Engineering BS"
+                      class: 2032
+                      # DetailedUserInfo: ...
+                      aboutMe: "Some wolf guy prowling about!"
+                      telegramUsername: "mrwolfy"
+                      # UserConnections: ...
+                      sonas:
+                        - name: "Wolf Wolferson"
+                          species: "Gray Wolf"
+                      socials:
+                        - platform: "Discord"
+                          handle: "@mrwolf"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+    patch:
+      summary: Modify details of a User.
+      tags:
+        - users
+      operationId: editUser
+      description: |-
+        Modify existing User details.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      requestBody:
+        description: Partial update of User details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DetailedUserInfoPartial"
+              examples:
+                - name: "Sr. Wolfy"
+      responses:
+        "200":
+          description: The updated User details.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      user:
+                        $ref: "#/components/schemas/DetailedUserInfo"
+                    required:
+                      - user
+                examples:
+                  - ok: true
+                    user:
+                      # SparseUserInfo: ...
+                      name: "Sr. Wolfy"
+                      degrees:
+                        - "Software Engineering BS"
+                      class: 2032
+                      # DetailedUserInfo: ...
+                      aboutMe: "Some wolf guy prowling about!"
+                      telegramUsername: "mrwolfy"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /user/{userId}/profile-picture:
+    parameters:
+      - in: path
+        name: userId
+        schema:
+          oneOf:
+            - type: string
+              const: "me"
+            - type: string
+              format: uuid
+        required: true
+        description: User Identifier.
+    put:
+      summary: Create/Replace a User profile picture.
+      tags:
+        - users
+      operationId: createUpdateUserProfilePicture
+      description: |-
+        Create the profile picture, or update the User's profile picture.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      requestBody:
+        description: The contents of the image.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                media:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: The profile picture was updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "201":
+          description: The profile picture was created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /events:
+    get:
+      summary: Get a listing of Events.
+      tags:
+        - events
+      operationId: getEvents
+      parameters:
+        - in: query
+          name: keyword
+          schema:
+            type: string
+            format: ".*"
+          required: false
+          description: Text search query.
+      description: |-
+        Get a listing of Events based off of an optional query.
+      responses:
+        "200":
+          description: The collection of Events.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      events:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/SparseEventWithOrganizer"
+                    required:
+                      - events
+                examples:
+                  - ok: true
+                    events:
+                      - id: "03233c03-ab02-47cb-be73-72ec97a976c4"
+                        summary: "Game Awards 2026 Watch Party!"
+                        location: "online"
+                        status: "confirmed"
+                        dtstart: "2026-12-10T19:30:00-0500"
+                        dtend: "2026-12-10T22:30:00-0500"
+                        organizer:
+                          id: "5f3bdd7a-c346-4a26-9754-97cadfaacaca"
+                          name: "Mr. Wolfy"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /event/{eventId}:
+    parameters:
+      - in: path
+        name: eventId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Event Identifier.
+    get:
+      summary: Get an Event.
+      tags:
+        - events
+      operationId: getEvent
+      description: |-
+        Get detailed information about an Event.
+      responses:
+        "200":
+          description: A detailed Event.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      event:
+                        $ref: "#/components/schemas/DetailedEvent"
+                    required:
+                      - event
+                examples:
+                  - ok: true
+                    event:
+                      id: "03233c03-ab02-47cb-be73-72ec97a976c4"
+                      description: "Time for all of us to get together and watch! Make sure to minimize mic noise!"
+                      summary: "Game Awards 2026 Watch Party!"
+                      location: "online"
+                      status: "confirmed"
+                      dtstart: "2026-12-10T19:30:00-0500"
+                      dtend: "2026-12-10T22:30:00-0500"
+                      organizer:
+                        id: "5f3bdd7a-c346-4a26-9754-97cadfaacaca"
+                        name: "Mr. Wolfy"
+                      rsvps:
+                        - id: "7e54e4d6-7f99-4b22-b365-283479a59c23"
+                          user:
+                            id: "2b8e2481-9d04-4e28-8137-bc984fc377eb"
+                            name: "Wormy Mc. Worm"
+                          answer: "yes"
+                        - id: "7e54e4d6-7f99-4b22-b365-283479a59c23"
+                          user:
+                            id: "1b09be0c-32df-44b0-af41-56a41f80d5ce"
+                            name: "Bill Gates"
+                          answer: "no"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+    patch:
+      summary: Modify details of an Event.
+      tags:
+        - events
+      operationId: updateEvent
+      description: |-
+        Update an Event's information.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      requestBody:
+        description: Partial Event information.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartialDetailedEventInfo"
+              examples:
+                - description: "Watch party time!"
+      responses:
+        "200":
+          description: The updated Event details.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      event:
+                        $ref: "#/components/schemas/DetailedEventInfo"
+                    required:
+                      - event
+                examples:
+                  - ok: true
+                    event:
+                      id: "03233c03-ab02-47cb-be73-72ec97a976c4"
+                      description: "Watch party time!"
+                      summary: "Game Awards 2026 Watch Party!"
+                      location: "online"
+                      status: "confirmed"
+                      dtstart: "2026-12-10T19:30:00-0500"
+                      dtend: "2026-12-10T22:30:00-0500"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled OR the requesting User cannot modify the Event.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+    delete:
+      summary: Delete an Event.
+      tags:
+        - events
+      operationId: deleteEvent
+      description: |-
+        Delete an existing Event.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      responses:
+        "202":
+          description: Event deletion has been scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled OR the requesting User cannot delete the Event.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /event/{eventId}/rsvps:
+    parameters:
+      - in: path
+        name: eventId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Event Identifier.
+    get:
+      summary: Get rsvps to an Event.
+      tags:
+        - rsvps
+      operationId: getEventRsvps
+      description: |-
+        Get rsvps to an existing Event.
+      responses:
+        "200":
+          description: A collection of rsvps.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - $ref: "#/components/schemas/EventRsvpConnections"
+                examples:
+                  - ok: true
+                    rsvps:
+                      - id: "7e54e4d6-7f99-4b22-b365-283479a59c23"
+                        user:
+                          id: "2b8e2481-9d04-4e28-8137-bc984fc377eb"
+                          name: "Wormy Mc. Worm"
+                        answer: "yes"
+                      - id: "7e54e4d6-7f99-4b22-b365-283479a59c23"
+                        user:
+                          id: "1b09be0c-32df-44b0-af41-56a41f80d5ce"
+                          name: "Bill Gates"
+                        answer: "no"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /event/{eventId}/rsvp/me:
+    parameters:
+      - in: path
+        name: eventId
+        schema:
+          type: string
+          format: uuid
+        required: true
+        description: Event Identifier.
+    get:
+      summary: Get own rsvp to an Event.
+      tags:
+        - rsvps
+      operationId: getOwnEventRsvp
+      description: |-
+        Get the current User's rsvp to an Event.
+      responses:
+        "200":
+          description: The User's rsvp.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      rsvp:
+                        $ref: "#/components/schemas/SparseRsvp"
+                    required:
+                      - rsvp
+                examples:
+                  - ok: true
+                    rsvp:
+                      id: "7e54e4d6-7f99-4b22-b365-283479a59c23"
+                      answer: "yes"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+          x-err-condition: The Event doesn't exist OR the RSVP doesn't exist.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+    put:
+      summary: Create/Update own rsvp to an Event.
+      tags:
+        - rsvps
+      operationId: createOrUpdateOwnEventRsvp
+      description: |-
+        Create own rsvp to an Event if it doesn't exist, otherwise update it.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      requestBody:
+        description: The rsvp answer.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answer:
+                  $ref: "#/components/schemas/RsvpAnswer"
+              required:
+                - answer
+              examples:
+                - answer: "yes"
+      responses:
+        "200":
+          description: The rsvp was updated or did not change.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "201":
+          description: The rsvp was created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+                examples:
+                  - ok: true
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+          x-err-condition: The Event doesn't exist.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+    delete:
+      summary: Delete own rsvp to an Event.
+      tags:
+        - rsvps
+      operationId: deleteOwnEventRsvp
+      description: |-
+        Delete own rsvp to an existing Event.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      responses:
+        "204":
+          description: The rsvp was deleted.
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+          x-err-condition: The Event doesn't exist OR the RSVP doesn't exist.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+
+components:
+  parameters:
+    CsrfParameter:
+      description: |-
+        The CSRF token for requests that mutate state.
+      in: header
+      name: X-CSRF-Token
+      schema:
+        type: string
+        format: hex
+      required: true
+  schemas:
+    # Generic Responses
+    Ok:
+      description: A non-error response.
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: true
+      required:
+        - ok
+    Error:
+      description: An error response.
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: false
+        msg:
+          type: string
+          pattern: "^.*$"
+          example: "Explanatory Error Message"
+      required:
+        - ok
+    # Domain Object Definitions
+    StubUserInfo:
+      description: Stub User information.
+      type: object
+      properties:
+        name:
+          type: string
+          format: ".*"
+      required:
+        - name
+    SparseUserInfo:
+      description: Sparse User information; superset of StubUserInfo.
+      allOf:
+        - $ref: "#/components/schemas/StubUserInfo"
+        - type: object
+          properties:
+            degrees:
+              type: array
+              items:
+                type: string
+                format: ".*"
+            class:
+              type: [integer, "null"]
+              format: int64
+              minimum: 0
+              maximum: 3500
+          required:
+            - degrees
+            - class
+    DetailedUserInfo:
+      description: Detailed User information; superset of SparseUserInfo.
+      allOf:
+        - $ref: "#/components/schemas/SparseUserInfo"
+        - type: object
+          properties:
+            aboutMe:
+              type: [string, "null"]
+              format: ".*"
+            telegramUsername:
+              type: [string, "null"]
+              format: "[^@].+"
+          required:
+            - aboutMe
+            - telegramUsername
+    StubUser:
+      description: A stub User record.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+          required:
+            - id
+        - $ref: "#/components/schemas/StubUserInfo"
+    SparseUser:
+      description: A sparse User record.
+      allOf:
+        - $ref: "#/components/schemas/StubUser"
+        - $ref: "#/components/schemas/SparseUserInfo"
+    DetailedUser:
+      description: A detailed User record.
+      allOf:
+        - $ref: "#/components/schemas/SparseUser"
+        - $ref: "#/components/schemas/DetailedUserInfo"
+    SparseSona:
+      description: Sparse information about a Sona.
+      properties:
+        name:
+          type: string
+          format: ".*"
+        species:
+          type: [string, "null"]
+          format: ".*"
+      reqired:
+        - name
+        - species
+    SparseSocial:
+      description: A link to a social media platform.
+      properties:
+        platform:
+          type: string
+          format: ".+"
+        handle:
+          type: string
+          format: ".+"
+      required:
+        - platform
+        - handle
+    UserConnections:
+      description: Connections with items related to a User.
+      type: object
+      properties:
+        sonas:
+          type: array
+          items:
+            $ref: "#/components/schemas/SparseSona"
+        socials:
+          type: array
+          items:
+            $ref: "#/components/schemas/SparseSocial"
+      required:
+        - sonas
+        - socials
+    DetailedUserInfoPartial:
+      description: -|
+        Specialization of DetailedUserInfo where all fields are optional.
+      $ref: "#/components/schemas/DetailedUserInfo"
+      required: []
+    DetailedUserWithConnections:
+      description: |-
+        A detailed User paired with User connections.
+      allOf:
+        - $ref: "#/components/schemas/DetailedUser"
+        - $ref: "#/components/schemas/UserConnections"
+    RsvpUserConnection:
+      description: An RSVP's connection to a User.
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/StubUser"
+      required:
+        - user
+    RsvpAnswer:
+      description: An RSVP answer.
+      type: string
+      enum: [no, maybe, yes]
+      examples:
+        - "yes"
+    SparseRsvpInfo:
+      description: Minimal RSVP information without connections.
+      type: object
+      properties:
+        answer:
+          $ref: "#/components/schemas/RsvpAnswer"
+      required:
+        - answer
+    SparseRsvp:
+      description: An RSVP without connections.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+          required:
+            - id
+        - $ref: "#/components/schemas/SparseRsvpInfo"
+    Rsvp:
+      description: A sparse RSVP - with User connection.
+      allOf:
+        - $ref: "#/components/schemas/SparseRsvp"
+        - $ref: "#/components/schemas/RsvpUserConnection"
+    EventOrganizerConnection:
+      description: Optional connection to Organizer/User related to an Event.
+      type: object
+      properties:
+        organizer:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/StubUser"
+      required:
+        - organizer
+    EventRsvpConnections:
+      description: Connection with Rsvps related to an Event.
+      type: object
+      properties:
+        rsvps:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rsvp"
+    SparseEventInfo:
+      description: Sparse Event information.
+      type: object
+      properties:
+        summary:
+          type: string
+          format: ".*"
+        location:
+          oneOf:
+            - type: "null"
+            - type: string
+              const: "online"
+            - type: string
+              format: ".*"
+        status:
+          type: string
+          enum: [canceled, tentative, confirmed]
+        dtstart:
+          type: string
+          format: date-time
+        dtend:
+          type: string
+          format: date-time
+      required:
+        - summary
+        - location
+        - status
+    DetailedEventInfo:
+      description: Detailed Event information; superset of SparseEventInfo.
+      allOf:
+        - type: object
+          properties:
+            description:
+              type: [string, "null"]
+              format: ".*"
+          required:
+            - description
+        - $ref: "#/components/schemas/SparseEventInfo"
+    PartialDetailedEventInfo:
+      description: DetailedEventInfo with no required fields.
+      $ref: "#/components/schemas/DetailedEventInfo"
+      required: []
+    SparseEventWithOrganizer:
+      description: Sparse Event record.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+          required:
+            - id
+        - $ref: "#/components/schemas/SparseEventInfo"
+        - $ref: "#/components/schemas/EventOrganizerConnection"
+    DetailedEvent:
+      description: >
+        Detailed Event record; superset of SparseEventWithOrganizer.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+          required:
+            - id
+        - $ref: "#/components/schemas/DetailedEventInfo"
+        - $ref: "#/components/schemas/EventOrganizerConnection"
+        - $ref: "#/components/schemas/EventRsvpConnections"
+
+  responses:
+    # 400
+    BadRequestError:
+      description: Bad Request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 401
+    UnauthorizedError:
+      description: Unauthorized.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 403
+    ForbiddenError:
+      description: Forbidden.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 404
+    NotFoundError:
+      description: NotFound.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 409
+    ConflictError:
+      description: Conflict.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 422
+    UnprocessableContentError:
+      description: Unprocessable Content.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 429
+    TooManyRequestsError:
+      description: Too Many Requests.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    # 500
+    InternalServerErrorError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: __Host-Http-furrit_session_id
+      description: >
+        Session token passed via an HTTP cookie - uses a cookie prefix.

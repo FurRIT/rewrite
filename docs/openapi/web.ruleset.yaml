@@ -1,0 +1,8 @@
+extends: [[vacuum:oas, recommended], [vacuum:owasp, all]]
+rules:
+  owasp-protection-global-safe: false
+  owasp-define-error-responses-401: false
+  owasp-define-error-validation: false
+  owasp-rate-limit: false
+  owasp-define-error-responses-429: false
+  owasp-define-error-responses-500: false
