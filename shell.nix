@@ -7,8 +7,12 @@ pkgs.mkShellNoCC {
     # shell.nix
     nixfmt
 
-    # docs/
+    # server
     go
+    gopls
+
+    # docs/
+    # vacuum; newer version installed using Go tool
     prettier
     yaml-language-server
   ];

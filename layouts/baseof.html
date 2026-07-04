@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta
+      name="description"
+      content="The official website for the Furries of the Rochester Institute of Technology in Rochester, NY, USA, better known as FurRIT."
+    />
+    <meta name="author" content="FurRIT" />
+
+    {{ with resources.Get "css/main.css" | resources.Minify }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ end }} {{ with resources.Get "css/partial.navbar.css" | resources.Minify
+    }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ end }}
+
+    <!-- TODO: og:.* definitions -->
+  </head>
+  <body>
+    {{ partial "navbar" }}
+    {{ block "main" . }} {{ end }}
+  </body>
+</html>

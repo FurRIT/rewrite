@@ -5,5 +5,16 @@
 !LICENSE
 
 !shell.nix
+!Makefile
+
+!go.mod
+!go.sum
+
+!cmd/
+
+!hugo.toml
+!content/
+!layouts/
+!assets/
 
 !docs/
