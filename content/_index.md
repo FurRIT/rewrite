@@ -1,3 +1,7 @@
+---
+title: "Home"
+---
+
 Welcome to the home of the Furries of RIT, locally known as FurRIT. We are the
 group for Furries who attend, work at, or are otherwise affiliated with the
 Rochester Institute of Technology in Rochester, NY, USA.

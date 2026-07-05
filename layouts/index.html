@@ -1,1 +1,11 @@
-{{ define "main" }} {{ .Content }} {{ end }}
+{{ define "main" }} {{ partial "header" "Furries of RIT" }}
+
+<main>
+  <div>{{ .Content }}</div>
+  <div>
+    <a href="{{ .Site.BaseURL }}/login">Login</a>
+    <a href="{{ .Site.BaseURL }}/register">Register</a>
+  </div>
+</main>
+
+{{ end }}
