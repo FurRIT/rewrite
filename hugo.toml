@@ -3,6 +3,7 @@ baseURL = "https://www.furrit.us"
 defaultContentLanguage = "en"
 
 publishDir = "build/hugo"
+disableHugoGeneratorInject = true
 
 disableKinds = ["rss", "sitemap", "taxonomy", "term", "section"]
 
