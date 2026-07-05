@@ -33,7 +33,7 @@ APP_BINS := $(addprefix $(APP_BUILD_DIR)/, $(GO_BIN_NAMES))
 TOOL_BIN_NAMES := partial-render
 TOOL_BINS := $(addprefix $(TOOL_DIR)/, $(TOOL_BIN_NAMES))
 
-PARTIAL_NAMES := admins
+PARTIAL_NAMES := admins sysadmins
 
 DEBUG_PARTIALS := $(addprefix $(DEBUG_PARTIAL_BUILD_DIR)/,$(addsuffix .html, $(PARTIAL_NAMES)))
 
