@@ -17,4 +17,7 @@
 !layouts/
 !assets/
 
+!codegen/
+!partials/
+
 !docs/
