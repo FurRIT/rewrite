@@ -1,0 +1,18 @@
+{{ define "main" }} {{ partial "header" "Events" }}
+
+<main>
+  <div>
+    <form id="search">
+      <input
+        id="query"
+        type="text"
+        name="query"
+        placeholder="Search by title, description, location, tags, and more..."
+      />
+      <input type="submit" value="Search" />
+    </form>
+  </div>
+  <div><a href="example.com">New Event</a></div>
+</main>
+
+{{ end }}

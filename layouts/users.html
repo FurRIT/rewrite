@@ -1,0 +1,17 @@
+{{ define "main" }} {{ partial "header" "Members" }}
+
+<main>
+  <div>
+    <form id="search">
+      <input
+        id="query"
+        type="text"
+        name="query"
+        placeholder="Search by name, telegram, major, species, and more..."
+      />
+      <input type="submit" value="Search" />
+    </form>
+  </div>
+</main>
+
+{{ end }}
