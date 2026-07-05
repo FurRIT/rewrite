@@ -14,9 +14,6 @@
 
     {{ with resources.Get "css/main.css" | resources.Minify }}
     <link rel="stylesheet" href="{{ .RelPermalink }}" />
-    {{ end }} {{ with resources.Get "css/partial.navbar.css" | resources.Minify
-    }}
-    <link rel="stylesheet" href="{{ .RelPermalink }}" />
     {{ end }} {{ if eq .Title .Site.Title }}
     <title>{{ .Site.Title }}</title>
     {{ else }}
