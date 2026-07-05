@@ -11,7 +11,7 @@ import (
 	"text/template"
 )
 
-func loadJson(path string) (map[string]any, error) {
+func loadJson(path string) (any, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func loadJson(path string) (map[string]any, error) {
 		return nil, err
 	}
 
-	var loaded map[string]any
+	var loaded any
 
 	if err := json.Unmarshal(buff.Bytes(), &loaded); err != nil {
 		return nil, err
