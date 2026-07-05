@@ -18,6 +18,9 @@
 !assets/
 !data/
 
+!package.json
+!package-lock.json
+
 !internal/
 
 !partials/
