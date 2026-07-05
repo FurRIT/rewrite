@@ -11,6 +11,9 @@ pkgs.mkShellNoCC {
     go
     gopls
 
+    # frontend
+    nodejs
+
     # docs/
     # vacuum; newer version installed using Go tool
     prettier
