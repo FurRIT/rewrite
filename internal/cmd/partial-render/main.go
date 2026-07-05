@@ -59,13 +59,19 @@ func loadTemplate(path string) (*template.Template, error) {
 }
 
 func main() {
-	fs := flag.NewFlagSet("partial-compile", flag.ContinueOnError)
+	fs := flag.NewFlagSet("partial-render", flag.ContinueOnError)
 
 	var dataPathArg string
 	var templatePathArg string
 
 	fs.StringVar(&dataPathArg, "data", "", "path to the data file")
 	fs.StringVar(&templatePathArg, "template", "", "path to the template")
+
+	fs.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "partial-render - A tool for rendering runtime templates for Hugo\n\n")
+		fmt.Fprintln(flag.CommandLine.Output(), "Usage of partial-render:")
+		fs.PrintDefaults()
+	}
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
