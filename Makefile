@@ -2,12 +2,10 @@ MODE ?= debug
 
 BUILD_DIR := target
 
-TOOL_DIR := $(BUILD_DIR)/tool
-
 DEBUG_DIR := $(BUILD_DIR)/debug
 RELEASE_DIR := $(BUILD_DIR)/release
 
-CODEGEN_BUILD_DIR := $(TOOL_DIR)/codgen
+TOOL_DIR := $(BUILD_DIR)/tool
 
 ifeq ($(MODE),debug)
 	APP_BUILD_DIR = $(DEBUG_DIR)/furrit
@@ -22,21 +20,21 @@ GO_SRCS := $(shell find . -name '*.go')
 APP_BIN_NAMES := furrit-server
 APP_BINS := $(addprefix $(APP_BUILD_DIR)/, $(GO_BIN_NAMES))
 
-CODEGEN_BIN_NAMES := partial-render
-CODEGEN_BINS := $(addprefix $(CODEGEN_BUILD_DIR)/, $(CODEGEN_BIN_NAMES))
+TOOL_BIN_NAMES := partial-render
+TOOL_BINS := $(addprefix $(TOOL_DIR)/, $(TOOL_BIN_NAMES))
 
-all: $(CODEGEN_BINS) hugo $(APP_BINS)
+all: $(TOOL_BINS) hugo $(APP_BINS)
 
 hugo: $(HUGO_BUILD_DIR)
 	go tool hugo -d $<
 
-$(APP_BUILD_DIR)/%: $(APP_BUILD_DIR) $(APP_SRCS)
+$(APP_BUILD_DIR)/%: $(APP_BUILD_DIR) $(GO_SRCS)
 	go build -o $@ $(patsubst $(APP_BUILD_DIR)/%,cmd/%/main.go,$@)
 
-$(CODEGEN_BUILD_DIR)/%: $(CODEGEN_BUILD_DIR) $(APP_SRCS)
-	go build -o $@ $(patsubst $(CODEGEN_BUILD_DIR)/%,codegen/cmd/%/main.go,$@)
+$(TOOL_DIR)/%: $(TOOL_DIR) $(GO_SRCS)
+	go build -o $@ $(patsubst $(TOOL_DIR)/%,internal/cmd/%/main.go,$@)
 
-$(CODEGEN_BUILD_DIR):
+$(TOOL_DIR):
 	mkdir -p $@
 
 $(HUGO_BUILD_DIR):
@@ -48,4 +46,4 @@ $(APP_BUILD_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean hugo
+.PHONY: all hugo clean
