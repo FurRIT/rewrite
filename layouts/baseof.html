@@ -10,14 +10,18 @@
     />
     <meta name="author" content="FurRIT" />
 
+    <!-- TODO: og:.* definitions -->
+
     {{ with resources.Get "css/main.css" | resources.Minify }}
     <link rel="stylesheet" href="{{ .RelPermalink }}" />
     {{ end }} {{ with resources.Get "css/partial.navbar.css" | resources.Minify
     }}
     <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ end }} {{ if eq .Title .Site.Title }}
+    <title>{{ .Site.Title }}</title>
+    {{ else }}
+    <title>{{ .Title }} · {{ .Site.Title }}</title>
     {{ end }}
-
-    <!-- TODO: og:.* definitions -->
   </head>
   <body>
     {{ partial "navbar" }} {{ block "main" . }} {{ end }} {{ partial "footer" }}
