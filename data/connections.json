@@ -1,0 +1,51 @@
+[
+  {
+    "name": "FurRIT",
+    "platforms": {
+      "Telegram": [
+        {
+          "name": "FurRIT Chat Folder",
+          "link": "https://t.me/addlist/gy2K43K2_tBjOWFh",
+          "tagline": "All Telegram group chats and channels in one place"
+        },
+        {
+          "name": "FurRIT Events Channel",
+          "link": "https://t.me/+Qw28RBBUCCTAGnGE",
+          "tagline": "We host regular meet-ups and events. Come join in the fun!"
+        }
+      ],
+      "Discord": [
+        {
+          "name": "FurRIT Discord",
+          "link": "https://discord.gg/kS4rryY",
+          "tagline": "Join us on Discord for games and fun!"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Friends of FurRIT",
+    "platforms": {
+      "Telegram": [
+        {
+          "name": "Rochester Furs",
+          "link": "https://t.me/Rochesterfurs",
+          "tagline": "A group for socializing and meeting other furs in the Rochester, NY area."
+        },
+        {
+          "name": "Rochester Furs Events Channel",
+          "link": "https://t.me/RochesterFurryEvents"
+        },
+        {
+          "name": "WNY Area Furries",
+          "link": "https://t.me/joinchat/CtXYUVky3_v73u21QrWF0Q",
+          "tagline": "Furries in Rochester as well as Syracuse, Buffalo, et. al."
+        },
+        {
+          "name": "WNY Area Furries Events Channel",
+          "link": "https://t.me/wnyfurevents"
+        }
+      ]
+    }
+  }
+]
