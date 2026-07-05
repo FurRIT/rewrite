@@ -260,7 +260,7 @@ paths:
       operationId: getUsers
       parameters:
         - in: query
-          name: keyword
+          name: query
           schema:
             type: string
             format: ".*"
@@ -490,7 +490,7 @@ paths:
       operationId: getEvents
       parameters:
         - in: query
-          name: keyword
+          name: query
           schema:
             type: string
             format: ".*"
