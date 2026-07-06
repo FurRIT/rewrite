@@ -10,3 +10,21 @@ disable = true
 
 # [minify]
 # minifyOutput = true
+
+[build]
+[build.buildStats]
+enable = true
+
+[[build.cachebusters]]
+source = 'assets/notwatching/hugo_stats\.json'
+target = "css"
+
+[module]
+[[module.mounts]]
+source = "assets"
+target = "assets"
+
+[[module.mounts]]
+disableWatch = true
+source = "hugo_stats.json"
+target = "assets/notwatching/hugo_stats.json"
