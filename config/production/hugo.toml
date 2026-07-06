@@ -1,0 +1,4 @@
+disableHugoGeneratorInject = true
+
+[minify]
+minifyOutput = true

@@ -1,16 +1,3 @@
-title = "FurRIT"
-baseURL = "https://www.furrit.us"
-defaultContentLanguage = "en"
-
-disableHugoGeneratorInject = true
-disableKinds = ["rss", "sitemap", "taxonomy", "term"]
-
-[sitemap]
-disable = true
-
-# [minify]
-# minifyOutput = true
-
 [build]
 [build.buildStats]
 enable = true
