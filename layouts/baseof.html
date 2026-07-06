@@ -13,14 +13,16 @@
     <!-- TODO: og:.* definitions -->
 
     {{ with resources.Get "css/main.css" | css.TailwindCSS }}
-    <link rel="stylesheet" href="{{ .RelPermalink }}" />
-    {{ end }} {{ if eq .Title .Site.Title }}
-    <title>{{ .Site.Title }}</title>
+      <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ end }}
+    {{ if eq .Title .Site.Title }}
+      <title>{{ .Site.Title }}</title>
     {{ else }}
-    <title>{{ .Title }} · {{ .Site.Title }}</title>
+      <title>{{ .Title }} · {{ .Site.Title }}</title>
     {{ end }}
   </head>
   <body class="bg-(--legacy-color-warm-gray-90)">
-    {{ block "main" . }} {{ end }} {{ partial "footer" }}
+    {{ block "main" . }}{{ end }}
+    {{ partial "footer" }}
   </body>
 </html>

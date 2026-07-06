@@ -1,34 +1,37 @@
-{{ define "main" }} {{ partial "header" "About" }}
+{{ define "main" }}
+  {{ partial "header" "About" }}
 
-<main>
-  <h2>Who We Are</h2>
-  {{ .Content }}
 
-  <h2>Connections</h2>
-  <div>
-    {{ range hugo.Data.connections }}
-    <h3>{{ .name }}</h3>
+  <main>
+    <h2>Who We Are</h2>
+    {{ .Content }}
+
+
+    <h2>Connections</h2>
     <div>
-      {{ range $name, $entries := .platforms }}
-      <h4>{{ $name }}</h4>
-      <div>
-        {{ range $entries }}
-        <p>
-          <a href="{{ .link }}" target="_blank">{{ .name }}</a>
-          {{ if .tagline }} - {{ .tagline }} {{ end }}
-        </p>
-        {{ end }}
-      </div>
+      {{ range hugo.Data.connections }}
+        <h3>{{ .name }}</h3>
+        <div>
+          {{ range $name, $entries := .platforms }}
+            <h4>{{ $name }}</h4>
+            <div>
+              {{ range $entries }}
+                <p>
+                  <a href="{{ .link }}" target="_blank">{{ .name }}</a>
+                  {{ if .tagline }}- {{ .tagline }}{{ end }}
+                </p>
+              {{ end }}
+            </div>
+          {{ end }}
+        </div>
       {{ end }}
     </div>
-    {{ end }}
-  </div>
 
-  <h2>Current Admins</h2>
-  {{ partial "runtime" "admins" }}
+    <h2>Current Admins</h2>
+    {{ partial "runtime" "admins" }}
 
-  <h2>Current SysAdmins</h2>
-  {{ partial "runtime" "sysadmins" }}
-</main>
 
+    <h2>Current SysAdmins</h2>
+    {{ partial "runtime" "sysadmins" }}
+  </main>
 {{ end }}

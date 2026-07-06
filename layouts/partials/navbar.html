@@ -1,18 +1,17 @@
-  <nav class="orange-page-box content-center mx-auto my-4">
-    <ul
-      class="w-full my-auto p-3 flex flex-row flex-nowrap align-items-center gap-3 text-base font-semibold *:my-auto"
-    >
-      <li class="!text-xl"><a href="{{ absURL "" }}">FurRIT</a></li>
-      <li><a href="{{ absURL "events" }}">Events</a></li>
-      <li><a href="{{ absURL "users" }}">Members</a></li>
-      <li><a href="{{ absURL "user/me" }}">Profile</a></li>
-      <li><a href="{{ absURL "about" }}">About</a></li>
+<nav class="orange-page-box mx-auto my-4 content-center">
+  <ul
+    class="align-items-center my-auto flex w-full flex-row flex-nowrap gap-3 p-3 text-base font-semibold *:my-auto"
+  >
+    <li class="!text-xl"><a href="{{ absURL "" }}">FurRIT</a></li>
+    <li><a href="{{ absURL "events" }}">Events</a></li>
+    <li><a href="{{ absURL "users" }}">Members</a></li>
+    <li><a href="{{ absURL "user/me" }}">Profile</a></li>
+    <li><a href="{{ absURL "about" }}">About</a></li>
 
-      {{ if eq .HasLogout "true" }}
-      <li class="self-end ml-auto">
+    {{ if eq .HasLogout "true" }}
+      <li class="ml-auto self-end">
         <a href="{{ absURL "logout" }}">Logout</a>
       </li>
-      {{ end }}
-    </ul>
-  </nav>
-</div>
+    {{ end }}
+  </ul>
+</nav>

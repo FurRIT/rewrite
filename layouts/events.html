@@ -1,24 +1,13 @@
-{{ define "main" }} {{ partial "header" "Events" }}
+{{ define "main" }}
+  {{ partial "navbar" (dict "HasLogout" "true" ) }}
+  {{ partial "header" "Events" }}
 
-<main>
-  <div>
-    <form id="search">
-      <input
-        id="query"
-        type="text"
-        name="query"
-        placeholder="Search by title, description, location, tags, and more..."
-      />
-      <input
-        type="submit"
-        value="Search"
-        class="button bg-(--legacy-color-green-35) text-white"
-      />
-    </form>
-  </div>
-  <div>
-    <a href="{{ absURL "/event/new" }}">New Event</a>
-  </div>
-</main>
 
+  <main>
+    {{ partial "search" (dict "Placeholder" "Search by title, description, location, tags, and more...") }}
+    <div
+      class="mx-auto mb-4 w-4/5 content-center rounded-lg bg-white p-4 text-base"
+    ></div>
+    <div id="results"></div>
+  </main>
 {{ end }}
