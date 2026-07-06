@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  /* https://www.rit.edu/brandportal/colors */
+  --rit-color-white: #FFFFFF;
+  --rit-color-orange: #F76902;
+  --rit-color-black: #000000;
+  --rit-color-pms-247c: #D0D3D4;
+  --rit-color-pms-429c: #A2AAAD;
+  --rit-color-pms-430c: #7C878E;
+  --rit-color-pms-warm-gray-1-c: #D7D2CB;
+  --rit-color-pms-warm-gray-5-c: #ACA39A;
+  --rit-color-pms-376c: #84BD00;
+  --rit-color-pms-382c: #C4D600;
+  --rit-color-pms-7703c: #009CBD;
+  --rit-color-pms-2665c: #7D55C7;
+  --rit-color-pms-485c: #DA291C;
+  --rit-color-pms-7408c: #F6BE00;
+  /* legacy */
+  --legacy-color-orange-60: hsl(15, 90%, 60%);
+  --legacy-color-warm-gray-90: hsl(30, 15%, 90%);
+  --legacy-color-warm-gray-80: hsl(30, 15%, 80%);
+  --legacy-color-green-35: hsl(60, 60%, 35%);
+
+}
+
+@layer common {
+  .orange-page-box {
+    @apply w-4/5 bg-(--legacy-color-orange-60) rounded-lg text-(--rit-color-white);
+  }
+
+  .white-main-box {
+    @apply w-4/5 content-center mx-auto bg-white rounded-lg p-4 mb-4 text-base;
+  }
+}

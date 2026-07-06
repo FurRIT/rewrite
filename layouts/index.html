@@ -1,10 +1,19 @@
-{{ define "main" }} {{ partial "header" "Furries of RIT" }}
+{{ define "main" }} {{ partial "navbar" (dict "HasLogout" "false" ) }} {{
+partial "header" "Furries of RIT" }}
 
-<main>
-  <div>{{ .Content }}</div>
-  <div>
-    <a href="{{ .Site.BaseURL }}/login">Login</a>
-    <a href="{{ .Site.BaseURL }}/register">Register</a>
+<main class="white-main-box">
+  <div class="*:mb-4">{{ .Content }}</div>
+  <div class="flex flex-row flex-nowrap gap-3 justify-center">
+    <a
+      class="bg-(--legacy-color-warm-gray-80) py-1 px-2 rounded-sm"
+      href="{{ .Site.BaseURL }}/login"
+      >Login</a
+    >
+    <a
+      class="bg-(--legacy-color-green-35) py-1 px-2 rounded-sm text-white"
+      href="{{ .Site.BaseURL }}/register"
+      >Register</a
+    >
   </div>
 </main>
 
