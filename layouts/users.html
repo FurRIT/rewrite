@@ -1,6 +1,7 @@
 {{ define "main" }}
+  {{ partial "navbar" (dict "HasLogout" "true" ) }}
   {{ partial "header" "Members" }}
   <main>
-    {{ partial "search" (dict "Placeholder" "Search by name, telegram, major,species, and more...") }}
+    {{ partial "search" (dict "Placeholder" "Search by name, telegram, major, species, and more...") }}
   </main>
 {{ end }}
