@@ -5,13 +5,13 @@ partial "header" "Furries of RIT" }}
   <div class="*:mb-4">{{ .Content }}</div>
   <div class="flex flex-row flex-nowrap gap-3 justify-center">
     <a
-      class="bg-(--legacy-color-warm-gray-80) py-1 px-2 rounded-sm"
-      href="{{ .Site.BaseURL }}/login"
+      class="button bg-(--legacy-color-warm-gray-80)"
+      href="{{ absURL "login" }}"
       >Login</a
     >
     <a
-      class="bg-(--legacy-color-green-35) py-1 px-2 rounded-sm text-white"
-      href="{{ .Site.BaseURL }}/register"
+      class="button bg-(--legacy-color-green-35) text-white"
+      href="{{ absURL "register" }}"
       >Register</a
     >
   </div>
