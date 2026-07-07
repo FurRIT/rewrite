@@ -1,0 +1,9 @@
+{{ $base := "" }}
+
+{{ if hugo.IsDevelopment }}
+  {{ $base = strings.Replace . "/" "-" }}
+{{ else }}
+  {{ $base = . }}
+{{ end }}
+
+{{ return ($base | absURL | safeHTMLAttr) }}
