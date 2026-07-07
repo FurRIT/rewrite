@@ -5,9 +5,7 @@
 
   <main>
     {{ partial "search" (dict "Placeholder" "Search by title, description, location, tags, and more...") }}
-    <div
-      class="page-box mx-auto mb-4 flex content-center rounded-lg bg-white p-4 text-base"
-    >
+    <div class="page-box white-main-box flex">
       <a
         href="{{ (partial "flathref" "event/new" ) }}"
         class="w-full rounded-sm bg-(--legacy-color-brown-40) py-1 text-center text-white hover:bg-(--legacy-color-brown-30)"
