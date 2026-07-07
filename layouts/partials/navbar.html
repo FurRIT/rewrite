@@ -8,10 +8,15 @@
     <li><a href="{{ absURL "user/me" }}">Profile</a></li>
     <li><a href="{{ absURL "about" }}">About</a></li>
 
-    {{ if eq .HasLogout "true" }}
-      <li class="ml-auto self-end">
-        <a href="{{ absURL "logout" }}">Logout</a>
-      </li>
+    {{ $logoutURL := absURL "logout" }}
+    {{ $logoutHTML := printf "<li class=\"ml-auto self-end\"><a href=\"%s\">Logout</a>" $logoutURL }}
+
+    {{ if hugo.IsDevelopment }}
+      {{ if .HasLogout }}
+        {{ $logoutHTML | safeHTML }}
+      {{ end }}
+    {{ else }}
+      {{ printf "{{ if .LoggedIn }}%s{{ end }}" $logoutHTML | safeHTML }}
     {{ end }}
   </ul>
 </nav>
