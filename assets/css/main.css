@@ -28,7 +28,7 @@
 
 @layer common {
   .page-box {
-    @apply sm:w-4/5 md:w-3/5 lg:w-2/5;
+    @apply sm:w-4/5 md:w-3/5 lg:w-1/2;
   }
 
   .orange-page-box {
