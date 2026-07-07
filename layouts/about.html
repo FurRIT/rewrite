@@ -3,30 +3,31 @@
   {{ partial "header" "About" }}
 
 
-  <main>
+  <main
+    class="page-box h2:text-white mx-auto mb-4 content-center rounded-lg bg-white p-4 *:mb-1 [&_h4]:text-base [&_h4]:font-bold [&>h2]:text-xl [&>h2]:font-bold [&>h3]:text-lg [&>h3]:font-bold"
+  >
     <h2>Who We Are</h2>
     {{ .Content }}
 
 
     <h2>Connections</h2>
-    <div>
-      {{ range hugo.Data.connections }}
-        <h3>{{ .name }}</h3>
-        <div>
-          {{ range $name, $entries := .platforms }}
-            <h4>{{ $name }}</h4>
-            <div>
-              {{ range $entries }}
-                <p>
-                  <a href="{{ .link }}" target="_blank">{{ .name }}</a>
-                  {{ if .tagline }}- {{ .tagline }}{{ end }}
-                </p>
-              {{ end }}
-            </div>
-          {{ end }}
-        </div>
+    {{ range hugo.Data.connections }}
+      <h3>{{ .name }}</h3>
+      {{ range $_name, $entries := .platforms }}
+        {{ range $entries }}
+          <p>
+            <a
+              href="{{ .link }}"
+              target="_blank"
+              class="text-(--legacy-color-brown-40) hover:text-(--legacy-color-brown-30) hover:underline"
+              >{{ .name }}</a
+            >
+            {{ if .tagline }}- {{ .tagline }}{{ end }}
+          </p>
+        {{ end }}
       {{ end }}
-    </div>
+    {{ end }}
+
 
     <h2>Current Admins</h2>
     {{ partial "runtime" "admins" }}
