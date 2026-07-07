@@ -26,12 +26,16 @@
 }
 
 @layer common {
+  .page-box {
+    @apply sm:w-4/5 md:w-3/5 lg:w-2/5;
+  }
+
   .orange-page-box {
-    @apply w-4/5 rounded-lg bg-(--legacy-color-orange-60) text-(--rit-color-white);
+    @apply rounded-lg bg-(--legacy-color-orange-60) text-(--rit-color-white);
   }
 
   .white-main-box {
-    @apply mx-auto mb-4 w-4/5 content-center rounded-lg bg-white p-4 text-base;
+    @apply mx-auto mb-4 content-center rounded-lg bg-white p-4 text-base;
   }
 
   .button {
