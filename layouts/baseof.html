@@ -12,7 +12,7 @@
 
     <!-- TODO: og:.* definitions -->
 
-    {{ with resources.Get "css/fonts.css" | css.Build }}
+    {{ with resources.Get "css/fonts.css" }}
       {{ if hugo.IsDevelopment }}
         <link rel="stylesheet" href="{{ .RelPermalink }}" />
       {{ else }}

@@ -17,6 +17,7 @@
 !layouts/
 !assets/
 !data/
+!static/
 
 !package.json
 !package-lock.json
