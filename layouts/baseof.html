@@ -16,9 +16,28 @@
       <link rel="stylesheet" href="{{ .Permalink }}" />
     {{ end }}
 
-    {{ with resources.Get "css/main.css" | css.TailwindCSS }}
-      <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ with resources.Get "css/main.css" }}
+      {{ $tailwindOpts := (dict "minify" false) }}
+      {{ if true }}
+        {{ $tailwindOpts = (dict "minify" true) }}
+      {{ end }}
+
+      {{ $styles := . | css.TailwindCSS $tailwindOpts }}
+
+      {{ if hugo.IsDevelopment }}
+        <link rel="stylesheet" href="{{ $styles.RelPermalink }}" />
+      {{ else }}
+        {{ with $styles | resources.Minify | resources.Fingerprint }}
+          <link
+            rel="stylesheet"
+            href="{{ $styles.RelPermalink }}"
+            integrity="{{ .Data.Integrity }}"
+            crossorigin="anonymous"
+          />
+        {{ end }}
+      {{ end }}
     {{ end }}
+
     {{ if eq .Title .Site.Title }}
       <title>{{ .Site.Title }}</title>
     {{ else }}
