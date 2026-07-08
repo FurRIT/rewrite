@@ -26,9 +26,24 @@
   --legacy-color-brown-40: hsl(30, 40%, 40%);
 }
 
+@theme {
+  /* see fonts.css - weights: 800 */
+  --font-title: "Raleway", sans-serif;
+  /* see fonts.css - weights: 400 (normal), 500, 600, 700 (bold) */
+  --font-body: "Hind", sans-serif;
+}
+
 @layer common {
   .page-box {
     @apply sm:w-4/5 md:w-3/5 lg:w-1/2;
+  }
+
+  .title-text {
+    @apply font-title font-extrabold;
+  }
+
+  .body-text {
+    @apply font-body;
   }
 
   .orange-page-box {
