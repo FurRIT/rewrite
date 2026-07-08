@@ -30,7 +30,7 @@ GO_SRCS := $(shell find . -name '*.go')
 APP_BIN_NAMES := furrit-server
 APP_BINS := $(addprefix $(APP_BUILD_DIR)/, $(GO_BIN_NAMES))
 
-TOOL_BIN_NAMES := partial-render
+TOOL_BIN_NAMES := partial-render fetch-google-fonts
 TOOL_BINS := $(addprefix $(TOOL_DIR)/, $(TOOL_BIN_NAMES))
 
 PARTIAL_NAMES := admins sysadmins
