@@ -13,7 +13,18 @@
     <!-- TODO: og:.* definitions -->
 
     {{ with resources.Get "css/fonts.css" | css.Build }}
-      <link rel="stylesheet" href="{{ .Permalink }}" />
+      {{ if hugo.IsDevelopment }}
+        <link rel="stylesheet" href="{{ .RelPermalink }}" />
+      {{ else }}
+        {{ with . | resources.Minify | resources.Fingerprint }}
+          <link
+            rel="stylesheet"
+            href="{{ .RelPermalink }}"
+            integrity="{{ .Data.Integrity }}"
+            crossorigin="anonymous"
+          />
+        {{ end }}
+      {{ end }}
     {{ end }}
 
     {{ with resources.Get "css/main.css" }}
