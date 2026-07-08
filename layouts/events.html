@@ -7,7 +7,7 @@
     {{ partial "search-bar" (dict "Placeholder" "Search by title, description, location, tags, and more...") }}
     <div class="page-box white-main-box flex">
       <a
-        href="{{ (partial "flathref" "event/new" ) }}"
+        href="{{ (partial "flatten-href" "event/new" ) }}"
         class="w-full rounded-sm bg-(--legacy-color-brown-40) py-1 text-center text-white hover:bg-(--legacy-color-brown-30)"
         >New Event</a
       >
