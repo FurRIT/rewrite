@@ -4,7 +4,7 @@
 
 
   <main>
-    {{ partial "search" (dict "Placeholder" "Search by title, description, location, tags, and more...") }}
+    {{ partial "search-bar" (dict "Placeholder" "Search by title, description, location, tags, and more...") }}
     <div class="page-box white-main-box flex">
       <a
         href="{{ (partial "flathref" "event/new" ) }}"
