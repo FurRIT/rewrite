@@ -30,7 +30,7 @@
         {{ with $styles | resources.Minify | resources.Fingerprint }}
           <link
             rel="stylesheet"
-            href="{{ $styles.RelPermalink }}"
+            href="{{ .RelPermalink }}"
             integrity="{{ .Data.Integrity }}"
             crossorigin="anonymous"
           />
