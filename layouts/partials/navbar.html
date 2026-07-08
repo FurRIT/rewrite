@@ -1,6 +1,11 @@
+{{/* A navbar that appears on most pages.
+
+  .HasLogout - Statically set whether or not the page has a 'logout' button.
+  .ParametrizedLogout - Generate a template that should the 'logout' button when .LoggedIn is true.
+*/}}
 <nav class="page-box orange-page-box mx-auto my-4 content-center">
   <ul
-    class="align-items-center my-auto flex w-full flex-row flex-nowrap gap-3 p-3 text-base font-semibold *:my-auto title-text"
+    class="align-items-center title-text my-auto flex w-full flex-row flex-nowrap gap-3 p-3 text-base font-semibold *:my-auto"
   >
     <li class="!text-xl"><a href="{{ absURL "" }}">FurRIT</a></li>
     <li><a href="{{ absURL "events" }}">Events</a></li>
@@ -10,7 +15,8 @@
 
     {{ $logoutURL := absURL "logout" }}
     {{ $logoutHTML := printf "<li class=\"ml-auto self-end\"><a href=\"%s\">Logout</a>" $logoutURL }}
-
+    {{ $logoutCond := (print "{{" "if .LoggedIn" " }}" $logoutHTML
+    "{{ " "end" " }}" ) }}
     {{ if hugo.IsDevelopment }}
       {{ if eq .HasLogout "true" }}
         {{ $logoutHTML | safeHTML }}
@@ -18,7 +24,7 @@
     {{ else }}
       {{ if eq .HasLogout "true" }}
         {{ if eq .ParametrizedLogout "true" }}
-          {{ printf "{{ if .LoggedIn }}%s{{ end }}" $logoutHTML | safeHTML }}
+          {{ $logoutCond | safeHTML }}
         {{ else }}
           {{ $logoutHTML | safeHTML }}
         {{ end }}
