@@ -78,7 +78,7 @@ func main() {
 			os.Exit(0)
 		}
 
-		fmt.Fprintf(os.Stderr, "error: %d\n", err)
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		os.Exit(1)
 	}
 
