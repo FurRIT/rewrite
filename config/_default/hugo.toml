@@ -7,4 +7,3 @@ disableKinds = ["rss", "sitemap", "taxonomy", "term"]
 
 [sitemap]
 disable = true
-
