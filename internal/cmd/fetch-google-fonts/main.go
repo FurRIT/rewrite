@@ -205,7 +205,7 @@ func fontFaceToCssEntry(w io.Writer, fontFace FontFace, path string) {
 	fmt.Fprintf(w, "  font-family: '%s';\n", fontFace.Family)
 	fmt.Fprintf(w, "  font-style: %s;\n", fontFace.Style)
 	fmt.Fprintf(w, "  font-weight: %d;\n", fontFace.Weight)
-	fmt.Fprintf(w, "  src: url(%s);\n", path)
+	fmt.Fprintf(w, "  src: url(%s) format(\"truetype\");\n", path)
 	fmt.Fprintf(w, "}\n\n")
 }
 
