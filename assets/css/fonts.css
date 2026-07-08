@@ -1,0 +1,34 @@
+@font-face {
+  font-family: "Hind";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/Hind-normal-400.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Hind";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../fonts/Hind-normal-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Hind";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../fonts/Hind-normal-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Hind";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/Hind-normal-700.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../fonts/Raleway-normal-800.ttf") format("truetype");
+}

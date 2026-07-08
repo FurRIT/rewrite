@@ -12,6 +12,10 @@
 
     <!-- TODO: og:.* definitions -->
 
+    {{ with resources.Get "css/fonts.css" | css.Build }}
+      <link rel="stylesheet" href="{{ .Permalink }}" />
+    {{ end }}
+
     {{ with resources.Get "css/main.css" | css.TailwindCSS }}
       <link rel="stylesheet" href="{{ .RelPermalink }}" />
     {{ end }}
