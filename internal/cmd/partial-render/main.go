@@ -83,11 +83,6 @@ func main() {
 	}
 
 	if len(dataPathArg) == 0 {
-		fmt.Fprintln(os.Stderr, "error: -data must be defined")
-		os.Exit(1)
-	}
-
-	if len(dataPathArg) == 0 {
 		fmt.Fprintln(os.Stderr, "error: -data must be passed")
 		os.Exit(1)
 	}
