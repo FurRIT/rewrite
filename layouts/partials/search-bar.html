@@ -1,17 +1,9 @@
 {{/* A search box for the search endpoint - TBD. */}}
-<div class="page-box white-main-box">
-  <form id="search" class="flex w-full flex-row flex-nowrap">
-    <input
-      id="query"
-      type="text"
-      name="query"
-      class="mr-3 w-full border-b border-b-3 border-(--legacy-color-warm-gray-80)"
-      placeholder="{{ .Placeholder }}"
-    />
-    <input
-      type="submit"
-      value="Search"
-      class="button bg-(--legacy-color-green-35) text-white"
-    />
-  </form>
+<div class="page-box white-main-box flex flex-row flex-nowrap">
+  {{ partial "textbox" (dict "Id" "query" "Name" "query" "Placeholder" .Placeholder "Class" "mr-3 w-full" ) }}
+  <button
+    class="button cursor-pointer bg-(--legacy-color-green-40) text-white hover:bg-(--legacy-color-green-35)"
+  >
+    Search
+  </button>
 </div>
