@@ -71,6 +71,8 @@ CREATE TABLE users (
     name TEXT NOT NULL,
     class INTEGER,
     degrees TEXT[],
+    about_me TEXT,
+    media_id UUID NOT NULL REFERENCES media_files(id) ON DELETE CASCADE,
     telegram_username TEXT, -- Nullable (kept for legacy resemblance to the old site)
     role user_role_type DEFAULT 'standard',
     is_disabled BOOLEAN DEFAULT FALSE,
@@ -96,31 +98,28 @@ CREATE INDEX idx_users_role ON users(role);
 -- CREATE INDEX idx_social_verifications_user ON social_verifications(user_id);
 -- CREATE INDEX idx_social_verifications_platform ON social_verifications(platform);
 
--- User Updatable Content (About Me, Photos, etc.)
--- Stores all user-generated content such as profiles, images, and future content types
-CREATE TABLE user_contents (
+-- =============================================================================
+-- MEDIA FILES TABLE
+-- =============================================================================
+
+-- Media Files (Centralized reference for all media content)
+-- Stores metadata for media files stored flat in a directory
+-- FK relationships from user_sonas, events, and other tables reference this table
+CREATE TABLE media_files (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    content_type TEXT NOT NULL, -- e.g., 'about_me', 'user_photo', 'sona_photo', 'banner'
-    title TEXT,                 -- Optional title for content
-    description TEXT,           -- Optional description/alt text
-    content_data TEXT NOT NULL, -- Main content (text for paragraphs, or metadata for files)
-    content_path TEXT,          -- File path/URL for images/files
-    is_active BOOLEAN DEFAULT TRUE, -- Track if content is visible
+    file_name TEXT NOT NULL,           -- Original file name with extension
+    file_path TEXT NOT NULL,           -- Relative path in the flat directory (e.g., "avatars/abc1234.png")
+    file_type TEXT NOT NULL,           -- MIME type (e.g., "image/png", "video/mp4")
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    
-    -- Ensure one active primary content per type per user
-    CONSTRAINT uq_user_content_type_active UNIQUE (user_id, content_type, is_active),
+    is_active BOOLEAN DEFAULT TRUE,    -- Track if media is visible/available
 
-    -- Content validation: content_data should not be empty
-    CONSTRAINT chk_content_data CHECK (LENGTH(content_data) > 0)
 );
+CREATE INDEX idx_media_files_path ON media_files(file_path);
+CREATE INDEX idx_media_files_type ON media_files(file_type);
+CREATE INDEX idx_media_files_active ON media_files(is_active) WHERE is_active = TRUE;
 
--- Indexes for efficient querying
-CREATE INDEX idx_user_contents_user_id ON user_contents(user_id);
-CREATE INDEX idx_user_contents_type ON user_contents(content_type);
-CREATE INDEX idx_user_contents_active ON user_contents(user_id, is_active) WHERE is_active = TRUE;
+
 
 
 -- =============================================================================
@@ -169,6 +168,7 @@ CREATE TABLE user_sonas (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     species TEXT, -- Nullable
+    media_id UUID REFERENCES media_files(id) ON DELETE CASCADE, -- media for photos
     UNIQUE(user_id, name)
 );
 CREATE INDEX idx_sonas_user ON user_sonas(user_id);
@@ -217,8 +217,8 @@ COMMENT ON COLUMN user_socials.is_verified IS 'True if a user has verified their
 
 COMMENT ON TABLE events IS 'Stores scheduled events and their details.';
 
-COMMENT ON TABLE user_contents IS 'Stores user-generated content such as about me text, photos, and other uploadable media.';
-COMMENT ON COLUMN user_contents.user_id IS 'References the user who owns this content.';
-COMMENT ON COLUMN user_contents.content_type IS 'Type of content (about_me, user_photo, sona_photo, etc.)';
-COMMENT ON COLUMN user_contents.content_path IS 'File path or URL for images/files (null for text-only content).';
-COMMENT ON COLUMN user_contents.is_active IS 'Flag to determine if content is visible in the UI.';
+-- COMMENT ON TABLE user_contents IS 'Stores user-generated content such as about me text, photos, and other uploadable media.';
+-- COMMENT ON COLUMN user_contents.user_id IS 'References the user who owns this content.';
+-- COMMENT ON COLUMN user_contents.content_type IS 'Type of content (about_me, user_photo, sona_photo, etc.)';
+-- COMMENT ON COLUMN user_contents.content_path IS 'File path or URL for images/files (null for text-only content).';
+-- COMMENT ON COLUMN user_contents.is_active IS 'Flag to determine if content is visible in the UI.';
