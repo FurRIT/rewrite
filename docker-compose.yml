@@ -1,0 +1,77 @@
+# Notes for future services:
+#https://github.com/awesome-selfhosted/awesome-selfhosted?tab=readme-ov-file#photo-galleries
+#https://chat.z.ai/c/ebb5fb8e-dcf5-4744-ac37-0b7681614142
+services:
+  # keycloak: # https://www.keycloak.org/getting-started/getting-started-docker
+  #   image: quay.io/keycloak/keycloak:26.5.6
+  #   container_name: keycloak
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+  #     KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+  #     KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+  #     KEYCLOAK_URL: ${KEYCLOAK_URL}
+  #     KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+  #     KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+  #   command:
+  #     - sh
+  #     - -c
+  #     - "echo 'Creating realm...'; ./bin/karaf -Djboss.keycloak.realm=$KEYCLOAK_REALM -Djboss.keycloak.client.id=$KEYCLOAK_CLIENT_ID -Djboss.keycloak.client.secret=$KEYCLOAK_CLIENT_SECRET -Djboss.keycloak.admin.user=admin -Djboss.keycloak.admin.password=admin"
+
+  # rails:
+  #   build: .
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - RAILS_ENV
+  #     - KEYCLOAK_URL
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./ruby:/app
+
+  db:
+    image: postgres:18-alpine
+    container_name: furrit_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - db_data:/var/lib/postgresql
+    expose:
+      - "5432" # Usefull for DB debugging
+    # networks:
+    #   - lightning
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    # depends_on:
+    #   - rails
+    command: caddy run --config /etc/caddy/Caddyfile --agree-to-terms-of-service --agree-to-privacy-policy
+    
+  # lightning: # https://williamhorning.dev/lightning/framework/plugins
+  #   image: codeberg.org/jersey/lightning:latest
+  #   volumes:
+  #     - ./lightning:/data
+  #   restart: always
+
+volumes:
+  db_data:
+
+# networks:
+#   lightning:

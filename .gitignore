@@ -28,3 +28,7 @@
 !partials/
 
 !docs/
+
+!docker-compose.yml
+!Caddyfile
+!db-schema.sql

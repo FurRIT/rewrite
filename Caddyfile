@@ -1,0 +1,54 @@
+furrit.org {
+        log {
+                output file /var/log/caddy/furrit.org.access.log {
+                        roll_size 10mb
+                        roll_keep 30
+                }
+                format json
+        }
+
+        # API and backend (todo: change port number)
+        handle /api/* {
+                reverse_proxy localhost:8000 {
+                        import security_headers
+                }
+                encode gzip
+        }
+
+        # Front end site
+        handle / { 
+                reverse_proxy localhost:443 {
+                        import security_headers
+                }
+                encode gzip
+        }
+
+        tls {
+                dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+(essentials) {
+	encode gzip
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+
+	log {
+		output file /var/log/crowdsec/caddy.log
+	}
+}
+
+(security_headers) {
+	header_up Strict-Transport-Security "max-age=31536000;"
+	header_up X-XSS-Protection "1; mode=block"
+	header_up X-Frame-Options "SAMEORIGIN"
+	header_up X-Robots-Tag "noindex, nofollow"
+	header_up X-Content-Type-Options "nosniff"
+	header_up -Server
+	header_up -X-Powered-By
+	header_up Referrer-Policy "same-origin"
+	header_up X-Real-Ip {client_ip}
+}
