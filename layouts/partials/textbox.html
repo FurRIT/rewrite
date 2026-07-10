@@ -1,0 +1,10 @@
+{{/* A single input text box. */}}
+{{ $type := default "text" .Type }}
+
+
+<input
+  id="{{ .Id }}"
+  type="{{ $type | safe.HTMLAttr }}"
+  class="{{ .Class }} border-b border-b-3 border-(--legacy-color-warm-gray-80) leading-none transition-colors duration-200 ease-in-out outline-none! focus:border-(--legacy-color-brown-40)"
+  placeholder="{{ .Placeholder }}"
+/>

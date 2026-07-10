@@ -260,7 +260,7 @@ paths:
       operationId: getUsers
       parameters:
         - in: query
-          name: keyword
+          name: query
           schema:
             type: string
             format: ".*"
@@ -490,7 +490,7 @@ paths:
       operationId: getEvents
       parameters:
         - in: query
-          name: keyword
+          name: query
           schema:
             type: string
             format: ".*"
@@ -533,6 +533,62 @@ paths:
         "403":
           $ref: "#/components/responses/ForbiddenError"
           x-err-condition: The requesting User is disabled.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
+  /event:
+    post:
+      summary: Create an Event.
+      tags:
+        - events
+      operationId: createEvent
+      description: |-
+        Create a new Event from event details.
+      parameters:
+        - $ref: "#/components/parameters/CsrfParameter"
+      requestBody:
+        description: Full Event information.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DetailedEventInfo"
+              examples:
+                - description: "Time for all of us to get together and watch! Make sure to minimize mic noise!"
+                  summary: "Game Awards 2026 Watch Party!"
+                  location: "online"
+                  status: "confirmed"
+                  dtstart: "2026-12-10T19:30:00-0500"
+                  dtend: "2026-12-10T22:30:00-0500"
+      responses:
+        "200":
+          description: The updated Event details.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      id:
+                        description: The identifier of the created Event.
+                        type: string
+                        format: uuid
+                    required:
+                      - id
+                examples:
+                  - ok: true
+                    id: "03233c03-ab02-47cb-be73-72ec97a976c4"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
         "429":
           $ref: "#/components/responses/TooManyRequestsError"
         "500":

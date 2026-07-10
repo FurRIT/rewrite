@@ -1,0 +1,10 @@
+{{ define "main" }}
+  {{ partial "navbar" }}
+  {{ partial "header" (dict "Title" "Members") }}
+  <main>
+    {{ partial "search-bar" (dict "Placeholder" "Search by name, telegram, major, species, and more...") }}
+    <div id="search-results"></div>
+  </main>
+
+  {{ partial "footer" }}
+{{ end }}

@@ -1,0 +1,7 @@
+*
+!.gitignore
+
+!*/
+
+!*/data.json
+!*/template.html

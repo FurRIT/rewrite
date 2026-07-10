@@ -1,0 +1,11 @@
+{{/* A header that appears on most pages.
+
+  .SizeClass - The size of the page (optional default normal).
+  .Title - The header title.
+*/}}
+{{ $size := default "page-box-normal" .SizeClass }}
+
+
+<header class="{{ $size }} orange-page-box mx-auto mb-4 content-center">
+  <p class="title-text p-3 text-3xl">{{ .Title }}</p>
+</header>

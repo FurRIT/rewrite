@@ -1,11 +1,50 @@
-<nav>
-  <ul>
-    <li><a href="{{ .Site.BaseURL }}">FurRIT</a></li>
-  </ul>
-  <ul>
-    <li><a href="{{ .Site.BaseURL }}/events">Events</a></li>
-    <li><a href="{{ .Site.BaseURL }}/users">Members</a></li>
-    <li><a href="{{ .Site.BaseURL }}/user/me">Profile</a></li>
-    <li><a href="{{ .Site.BaseURL }}/about">About</a></li>
+{{/* A navbar that appears on most pages.
+
+  .SizeClass - The size of the page (optional default normal).
+  .NoMiddle - Whether or not the navbar should exclude the middle portions (Events, Members, Profile, About).
+  .HastLastButton - Statically set whether or not the page has a 'logout' button (default true).
+  .TemplateLastButton - Generate a template that inserts the last button when .LoggedIn is true (default false).
+  .LastButton.URL - Last button URL (default absURL "logout").
+  .LastButton.Name - Last button name (default Logout).
+*/}}
+
+{{ $size := default "page-box-normal" .SizeClass }}
+{{ $noMiddle := default false .NoMiddle }}
+{{ $hasLastButton := default true .HastLastButton }}
+{{ $templateLastButton := default false .TemplateLastButton }}
+{{ $lastButton := default (dict "URL" (absURL "logout") "Name" "Logout") .LastButton }}
+
+
+<nav class="{{ $size }} orange-page-box mx-auto my-4 content-center">
+  <ul
+    class="align-items-center title-text my-auto flex w-full flex-row flex-nowrap gap-3 p-3 text-base font-semibold *:my-auto"
+  >
+    <li class="!text-xl"><a href="{{ absURL "" }}">FurRIT</a></li>
+
+    {{ if not .NoMiddle }}
+      <li><a href="{{ absURL "events" }}">Events</a></li>
+      <li><a href="{{ absURL "users" }}">Members</a></li>
+      <li><a href="{{ absURL "user/me" }}">Profile</a></li>
+      <li><a href="{{ absURL "about" }}">About</a></li>
+    {{ end }}
+
+    {{ $logoutURL := absURL "logout" }}
+    {{ $logoutHTML := print "<li class=\"ml-auto self-end\"><a href=\"" $lastButton.URL "\">" $lastButton.Name "</a></li>" }}
+
+    {{ $loggedInIf := print "{{ " "if .LoggedIn" " }}" }}
+    {{ $loggedInEnd := print "{{ " "end" " }}" }}
+    {{ $logoutCond := print $loggedInIf $logoutHTML $loggedInEnd }}
+
+    {{ if hugo.IsDevelopment }}
+      {{ if $hasLastButton }}
+        {{ $logoutHTML | safeHTML }}
+      {{ end }}
+    {{ else }}
+      {{ if $hasLastButton }}
+        {{ $logoutHTML | safeHTML }}
+      {{ else if $templateLastButton }}
+        {{ $logoutCond | safeHTML }}
+      {{ end }}
+    {{ end }}
   </ul>
 </nav>

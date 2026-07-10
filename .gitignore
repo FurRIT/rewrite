@@ -12,9 +12,19 @@
 
 !cmd/
 
-!hugo.toml
+!config/
 !content/
 !layouts/
 !assets/
+!data/
+!static/
+
+!package.json
+!package-lock.json
+!.prettierrc.json
+
+!internal/
+
+!partials/
 
 !docs/

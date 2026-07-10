@@ -7,6 +7,8 @@ tool (
 	github.com/gohugoio/hugo
 )
 
+require github.com/tdewolff/parse/v2 v2.8.12
+
 require (
 	cel.dev/expr v0.25.1 // indirect
 	charm.land/bubbles/v2 v2.1.0 // indirect
@@ -206,7 +208,6 @@ require (
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tdewolff/minify/v2 v2.24.13 // indirect
-	github.com/tdewolff/parse/v2 v2.8.12 // indirect
 	github.com/tetratelabs/wazero v1.12.0 // indirect
 	github.com/tliron/commonlog v0.2.20 // indirect
 	github.com/tliron/glsp v0.2.2 // indirect

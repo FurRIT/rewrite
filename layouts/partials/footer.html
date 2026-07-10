@@ -1,0 +1,17 @@
+{{/* A footer that appears on most pages.
+
+  .SizeClass - The size of the page (optional default normal).
+  .TextSizeClass - The size of the font (optional default text-base).
+*/}}
+{{ $boxSize := default "page-box-normal" .SizeClass }}
+{{ $textSize := default "text-base" .TextSizeClass }}
+
+
+<footer
+  class="{{ $boxSize }} {{ $textSize }} orange-page-box mx-auto flex flex-row flex-nowrap place-content-between content-center p-3 px-3"
+>
+  <a href="https://github.com/FurRIT/rewrite" target="_blank"
+    >FurRIT.us is an Open Source project</a
+  >
+  <a href="{{ absURL "privacy-policy" }}">FurRIT Privacy Policy</a>
+</footer>

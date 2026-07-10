@@ -1,0 +1,11 @@
+{{/* A nested page that is intentionally indirected to satisfy Hugo's nesting requirements. */}}
+
+{{ $base := "" }}
+
+{{ if hugo.IsDevelopment }}
+  {{ $base = strings.Replace . "/" "-" }}
+{{ else }}
+  {{ $base = . }}
+{{ end }}
+
+{{ return ($base | absURL | safeHTMLAttr) }}

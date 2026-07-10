@@ -1,0 +1,10 @@
+title = "FurRIT"
+baseURL = "https://www.furrit.us"
+
+defaultContentLanguage = "en"
+
+uglyurls = true
+disableKinds = ["rss", "sitemap", "taxonomy", "term"]
+
+[sitemap]
+disable = true

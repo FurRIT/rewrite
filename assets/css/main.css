@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  /* https://www.rit.edu/brandportal/colors */
+  --rit-color-white: #ffffff;
+  --rit-color-orange: #f76902;
+  --rit-color-black: #000000;
+  --rit-color-pms-247c: #d0d3d4;
+  --rit-color-pms-429c: #a2aaad;
+  --rit-color-pms-430c: #7c878e;
+  --rit-color-pms-warm-gray-1-c: #d7d2cb;
+  --rit-color-pms-warm-gray-5-c: #aca39a;
+  --rit-color-pms-376c: #84bd00;
+  --rit-color-pms-382c: #c4d600;
+  --rit-color-pms-7703c: #009cbd;
+  --rit-color-pms-2665c: #7d55c7;
+  --rit-color-pms-485c: #da291c;
+  --rit-color-pms-7408c: #f6be00;
+  /* legacy */
+  --legacy-color-orange-60: hsl(15, 90%, 60%);
+  --legacy-color-warm-gray-90: hsl(30, 15%, 90%);
+  --legacy-color-warm-gray-80: hsl(30, 15%, 80%);
+  --legacy-color-green-35: hsl(60, 60%, 35%);
+  --legacy-color-green-40: hsl(60, 60%, 40%);
+  --legacy-color-brown-30: hsl(30, 40%, 30%);
+  --legacy-color-brown-40: hsl(30, 40%, 40%);
+}
+
+@theme {
+  /* see fonts.css - weights: 800 */
+  --font-title: "Raleway", sans-serif;
+  /* see fonts.css - weights: 400 (normal), 500, 600, 700 (bold) */
+  --font-body: "Hind", sans-serif;
+}
+
+@layer common {
+  .page-box-normal {
+    @apply sm:w-4/5 md:w-3/5 lg:w-1/2;
+  }
+
+  .page-box-small {
+    @apply w-md;
+  }
+
+  .title-text {
+    @apply font-title font-extrabold;
+  }
+
+  .body-text {
+    @apply font-body;
+  }
+
+  .orange-page-box {
+    @apply rounded-lg bg-(--legacy-color-orange-60) text-(--rit-color-white);
+  }
+
+  .white-main-box {
+    @apply mx-auto mb-4 content-center rounded-lg bg-white p-4 text-base;
+  }
+
+  .button {
+    @apply rounded-sm px-2 py-1;
+  }
+}

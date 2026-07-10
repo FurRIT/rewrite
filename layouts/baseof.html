@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <meta
       name="description"
@@ -10,17 +10,54 @@
     />
     <meta name="author" content="FurRIT" />
 
-    {{ with resources.Get "css/main.css" | resources.Minify }}
-    <link rel="stylesheet" href="{{ .RelPermalink }}" />
-    {{ end }} {{ with resources.Get "css/partial.navbar.css" | resources.Minify
-    }}
-    <link rel="stylesheet" href="{{ .RelPermalink }}" />
+    {{ if .Params.csrf }}
+      {{ partial "runtime-partial" "csrf" }}
     {{ end }}
 
-    <!-- TODO: og:.* definitions -->
+    {{ with resources.Get "css/fonts.css" }}
+      {{ if hugo.IsDevelopment }}
+        <link rel="stylesheet" href="{{ .RelPermalink }}" />
+      {{ else }}
+        {{ with . | resources.Minify | resources.Fingerprint }}
+          <link
+            rel="stylesheet"
+            href="{{ .RelPermalink }}"
+            integrity="{{ .Data.Integrity }}"
+            crossorigin="anonymous"
+          />
+        {{ end }}
+      {{ end }}
+    {{ end }}
+
+    {{ with resources.Get "css/main.css" }}
+      {{ $tailwindOpts := (dict "minify" false) }}
+      {{ if true }}
+        {{ $tailwindOpts = (dict "minify" true) }}
+      {{ end }}
+
+      {{ $styles := . | css.TailwindCSS $tailwindOpts }}
+
+      {{ if hugo.IsDevelopment }}
+        <link rel="stylesheet" href="{{ $styles.RelPermalink }}" />
+      {{ else }}
+        {{ with $styles | resources.Minify | resources.Fingerprint }}
+          <link
+            rel="stylesheet"
+            href="{{ .RelPermalink }}"
+            integrity="{{ .Data.Integrity }}"
+            crossorigin="anonymous"
+          />
+        {{ end }}
+      {{ end }}
+    {{ end }}
+
+    {{ if eq .Title .Site.Title }}
+      <title>{{ .Site.Title }}</title>
+    {{ else }}
+      <title>{{ .Title }} - {{ .Site.Title }}</title>
+    {{ end }}
   </head>
-  <body>
-    {{ partial "navbar" }}
-    {{ block "main" . }} {{ end }}
+  <body class="bg-(--legacy-color-warm-gray-90)">
+    {{ block "main" . }}{{ end }}
   </body>
 </html>

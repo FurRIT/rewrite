@@ -214,6 +214,22 @@ paths:
           $ref: "#/components/responses/TooManyRequestsError"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /event/new:
+    get:
+      summary: Gets the event creation page.
+      tags:
+        - events
+        - logged-in
+      operationId: getEventMaker
+      responses:
+        "200":
+          $ref: "#/components/responses/HtmlPage"
+        "301":
+          $ref: "#/components/responses/MovedPermanentlyError"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /event/{eventId}:
     parameters:
       - in: path

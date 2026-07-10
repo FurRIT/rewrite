@@ -1,0 +1,32 @@
+{{ define "main" }}
+  {{ partial "navbar" (dict "SizeClass" "page-box-small" "NoMiddle" true "LastButton" (dict "URL" (absURL "register") "Name" "Register")) }}
+  {{ partial "header" (dict "SizeClass" "page-box-small" "Title" "Login") }}
+
+
+  <main class="page-box-small white-main-box body-text">
+    <div
+      class="mt-2 mb-5 flex w-full flex-col flex-nowrap content-center [&_*]:text-lg [&>*]:mb-5 [&>*:last-child]:mb-0"
+    >
+      {{ partial "textbox" (dict "Id" "username" "Type" "text" "Placeholder" "Username" "Class" "block") }}
+      {{ partial "textbox" (dict "Id" "password" "Type" "password" "Placeholder" "Password" "Class" "block") }}
+    </div>
+    <div class="mx-auto mb-3 text-center">
+      <a
+        class="text-(--legacy-color-brown-40) hover:text-(--legacy-color-brown-30) hover:underline"
+        href="{{ absURL "forgot-password" }}"
+      >
+        Forgot Password?</a
+      >
+    </div>
+    <div class="mx-auto flex flex-nowrap items-center justify-center">
+      <button
+        id="login-button"
+        class="button cursor-pointer bg-(--legacy-color-green-40) text-white hover:bg-(--legacy-color-green-35)"
+      >
+        Login
+      </button>
+    </div>
+  </main>
+
+  {{ partial "footer" (dict "SizeClass" "page-box-small" "TextSizeClass" "text-sm") }}
+{{ end }}

@@ -1,0 +1,14 @@
+disableHugoGeneratorInject = true
+
+[minify]
+minifyOutput = true
+
+[[cascade]]
+[cascade.build]
+render = "never"
+list = "never"
+publishResources = false
+
+[cascade.target]
+kind = "page"
+path = "{**logout*}"

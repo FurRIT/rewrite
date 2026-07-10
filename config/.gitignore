@@ -1,0 +1,8 @@
+*
+!.gitignore
+
+!_default/
+!development/
+!production/
+
+!*/*.toml

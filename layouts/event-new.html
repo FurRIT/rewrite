@@ -1,0 +1,53 @@
+{{ define "main" }}
+  {{ partial "navbar" }}
+  {{ partial "header" (dict "Title" "New Event") }}
+
+
+  <main
+    class="page-box-normal white-main-box body-text flex flex-col flex-nowrap *:mb-2 [&_h2]:text-xl [&_h2]:font-bold"
+  >
+    <h2>Title</h2>
+    {{ partial "textbox" (dict "Id" "summary" "Type" "text" "Placeholder" "Summary..." "Class" "block") }}
+
+
+    <h2>Location</h2>
+    {{ partial "textbox" (dict "Id" "location" "Placeholder" "Location..." "Class" "block") }}
+
+
+    <div
+      class="flex w-full flex-row flex-nowrap justify-center [&_h2]:mx-auto [&_h2]:text-center"
+    >
+      <div>
+        <h2>Start</h2>
+        <input type="datetime-local" id="start" />
+      </div>
+      <div>
+        <h2>End</h2>
+        <input type="datetime-local" id="end" />
+      </div>
+    </div>
+
+    <h2>Status</h2>
+    <select id="status">
+      <option value="tentative">Tentative</option>
+      <option value="confirmed" selected>Confirmed</option>
+    </select>
+
+    <h2>Description</h2>
+    <textarea id="description" placeholder="About this event..."></textarea>
+
+    <div class="flex flex-row flex-nowrap justify-center gap-3">
+      <a
+        class="button bg-(--legacy-color-warm-gray-90) hover:bg-(--legacy-color-warm-gray-80)"
+        href="{{ absURL "events" }}"
+        >Cancel</a
+      >
+      <a
+        class="button cursor-pointer bg-(--legacy-color-green-40) text-white hover:bg-(--legacy-color-green-35)"
+        >Save</a
+      >
+    </div>
+  </main>
+
+  {{ partial "footer" }}
+{{ end }}

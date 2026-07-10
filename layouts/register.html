@@ -1,0 +1,23 @@
+{{ define "main" }}
+  {{ partial "navbar" (dict "SizeClass" "page-box-small" "NoMiddle" true "LastButton" (dict "URL" (absURL "login") "Name" "Login")) }}
+  {{ partial "header" (dict "SizeClass" "page-box-small" "Title" "Register") }}
+
+
+  <main class="page-box-small white-main-box body-text">
+    <div
+      class="mt-2 mb-5 flex w-full flex-col flex-nowrap content-center [&_*]:text-lg [&>*]:mb-5 [&>*:last-child]:mb-0"
+    >
+      {{ partial "textbox" (dict "Id" "rit-username" "Placeholder" "RIT Username" "Class" "block") }}
+    </div>
+    <div class="mx-auto flex flex-nowrap items-center justify-center">
+      <button
+        id="register-button"
+        class="button cursor-pointer bg-(--legacy-color-green-40) text-white hover:bg-(--legacy-color-green-35)"
+      >
+        Register
+      </button>
+    </div>
+  </main>
+
+  {{ partial "footer" (dict "SizeClass" "page-box-small" "TextSizeClass" "text-sm") }}
+{{ end }}

@@ -2,10 +2,12 @@ OPENAPI_FILES := $(wildcard *.openapi.yaml)
 
 LINT_OPENAPI_FILES := $(addprefix lint., $(OPENAPI_FILES))
 
+PRETTIER := npx prettier
+
 all: $(LINT_OPENAPI_FILES)
 
 fmt:
-	prettier -w *.yaml
+	$(PRETTIER) -w *.yaml
 
 lint.%.openapi.yaml:
 	vacuum \
@@ -20,6 +22,6 @@ lint.%.openapi.yaml:
 		--ruleset $(patsubst lint.%.openapi.yaml, %.ruleset.yaml, $@) \
 		--ignore-file $(patsubst lint.%.openapi.yaml, %.ignore.yaml, $@) \
 		$(@:lint.%=%)
-	prettier -c $(@:lint.%=%)
+	$(PRETTIER) -c $(@:lint.%=%)
 
 .PHONY: all fmt
