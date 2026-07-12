@@ -7,6 +7,8 @@ RELEASE_DIR := $(BUILD_DIR)/release
 
 TOOL_DIR := $(BUILD_DIR)/tool
 
+HUGO_GO_BIN_FLAGS = -e production
+
 ifeq ($(MODE),debug)
 	DEBUG = 1
 
@@ -14,15 +16,11 @@ ifeq ($(MODE),debug)
 	HUGO_BUILD_DIR = $(DEBUG_DIR)/hugo
 
 	DEBUG_PARTIAL_BUILD_DIR = $(DEBUG_DIR)/mock
-
-	HUGO_FLAGS = -e development
 else
 	RELEASE = 1
 
 	APP_BUILD_DIR = $(RELEASE_DIR)/furrit
 	HUGO_BUILD_DIR = $(RELEASE_DIR)/hugo
-
-	HUGO_FLAGS = -e production
 endif
 
 GO_SRCS := $(shell find . -name '*.go')
@@ -37,10 +35,10 @@ PARTIAL_NAMES := admins sysadmins csrf
 
 DEBUG_PARTIALS := $(addprefix $(DEBUG_PARTIAL_BUILD_DIR)/,$(addsuffix .html, $(PARTIAL_NAMES)))
 
-all: $(TOOL_BINS) hugo $(APP_BINS)
+all: $(TOOL_BINS) frontend $(APP_BINS)
 
-hugo: $(HUGO_BUILD_DIR) $(if $(DEBUG),$(DEBUG_PARTIALS),)
-	go tool hugo -d $< $(HUGO_FLAGS)
+frontend: $(HUGO_BUILD_DIR) $(if $(DEBUG),$(DEBUG_PARTIALS),)
+	go tool hugo -d $< $(HUGO_GO_BIN_FLAGS)
 
 $(DEBUG_PARTIAL_BUILD_DIR)/%.html: $(DEBUG_PARTIAL_BUILD_DIR) partials/%/data.json partials/%/template.html
 	$(TOOL_DIR)/partial-render -data $(word 2,$^) -template $(word 3,$^) > $@
@@ -66,4 +64,4 @@ $(APP_BUILD_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all hugo clean
+.PHONY: all frontend clean

@@ -15,6 +15,9 @@ pkgs.mkShellNoCC {
     nodejs
     # prettier; installed via npm
 
+    # mock
+    deno
+
     # docs/
     # vacuum; newer version installed using Go tool
     # prettier; installed via npm

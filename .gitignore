@@ -19,6 +19,7 @@
 !data/
 !static/
 
+!deno.json
 !package.json
 !package-lock.json
 !.prettierrc.json
@@ -28,3 +29,5 @@
 !partials/
 
 !docs/
+
+!mock/
