@@ -116,6 +116,22 @@ async function* spawnHugoGenerator(
   }
 }
 
+async function generateMockData(outpath: string) {
+  const command = new Deno.Command(Deno.execPath(), {
+    args: ["-A", "mock/data.ts", "-o", outpath],
+    stdin: "null",
+    stderr: "piped",
+    stdout: "piped",
+  });
+  const child = command.spawn();
+
+  const { code } = await child.output();
+  assert(code === 0);
+
+  const fancy = path.relative(REPO_ROOT_DIR_PATH, outpath);
+  log.info(`[mock] created data file ${fancy}`);
+}
+
 const OUTPUT_DIR = path.join(REPO_ROOT_DIR_PATH, "develop");
 
 async function main() {
@@ -133,9 +149,12 @@ async function main() {
 
   const hugoOutDir = path.join(OUTPUT_DIR, "hugo");
   const partialOutDir = path.join(OUTPUT_DIR, "partial");
+  const mockDataOutPath = path.join(OUTPUT_DIR, "data.json");
 
   Deno.mkdir(hugoOutDir, { recursive: true });
   Deno.mkdir(partialOutDir, { recursive: true });
+
+  await generateMockData(mockDataOutPath);
 
   const hugo = spawnHugoGenerator(hugoOutDir);
   const partial = spawnPartialGenerator(partialOutDir);
