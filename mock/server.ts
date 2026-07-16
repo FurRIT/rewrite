@@ -1,3 +1,5 @@
+import { retry } from "@std/async/retry";
+import { debounce } from "@std/async/debounce";
 import { parseArgs } from "@std/cli/parse-args";
 import { getReasonPhrase } from "http-status-codes";
 import { Event, MockData, User } from "./data.ts";
@@ -24,12 +26,13 @@ function errorResponse(status: number): Response {
   );
 }
 
-type IndexedData = {
+type HandlerCtx = {
   users: Record<string, User>;
   events: Record<string, Event>;
+  modifying: boolean;
 };
 
-function makeHandler(indexed: IndexedData): (req: Request) => Response {
+function makeHandler(indexed: HandlerCtx): (req: Request) => Response {
   return (req: Request): Response => {
     const url = new URL(req.url);
 
@@ -106,6 +109,38 @@ function makeHandler(indexed: IndexedData): (req: Request) => Response {
   };
 }
 
+async function makeServer(
+  path: string,
+): Promise<[Deno.HttpServer<Deno.Addr>, HandlerCtx]> {
+  let mock: MockData | null = null;
+
+  {
+    const text = await Deno.readTextFile(path);
+    mock = JSON.parse(text) as MockData;
+  }
+
+  const indexed: {
+    users: Record<string, User>;
+    events: Record<string, Event>;
+  } = { users: {}, events: {} };
+  for (const user of mock.users) {
+    indexed.users[user.id] = user;
+  }
+  for (const event of mock.events) {
+    indexed.events[event.id] = event;
+  }
+
+  const ctx: HandlerCtx = { ...indexed, modifying: false };
+  return [
+    Deno.serve({
+      onListen({ port, hostname }) {
+        console.log(`Server started on http://${hostname}:${port}`);
+      },
+    }, makeHandler(ctx)),
+    ctx,
+  ];
+}
+
 async function main() {
   const flags = parseArgs(Deno.args, {
     alias: { data: "d" },
@@ -119,28 +154,42 @@ async function main() {
     console.error("error: -d, --data must be provided");
     process.exit(1);
   }
+  const dataPath: string = flags.data;
 
-  let mock: MockData | null = null;
+  let [server, ctx] = await makeServer(dataPath);
 
-  {
-    const text = await Deno.readTextFile(flags.data);
-    mock = JSON.parse(text) as MockData;
-  }
+  const onEvent = async (_: Deno.FsEvent) => {
+    console.log(dataPath, "modified; reloading...");
+    if (ctx.modifying) {
+      return;
+    }
 
-  const indexed: IndexedData = { users: {}, events: {} };
-  for (const user of mock.users) {
-    indexed.users[user.id] = user;
-  }
-  for (const event of mock.events) {
-    indexed.events[event.id] = event;
-  }
+    await server.shutdown();
+    [server, ctx] = await makeServer(dataPath);
+  };
 
-  const server = Deno.serve(makeHandler(indexed));
+  const debounceOnEvent = debounce(onEvent, 300);
 
   Deno.addSignalListener("SIGINT", async () => {
     console.log("shutting down");
     await server.shutdown();
   });
+
+  while (true) {
+    const watcher = Deno.watchFs(dataPath);
+
+    for await (const event of watcher) {
+      if (event.kind === "remove") {
+        break;
+      }
+
+      debounceOnEvent(event);
+    }
+
+    // If the file was removed (see break above) - attempt to stat the file
+    // repeatedly assuming that it will be rewritten.
+    await retry(() => Deno.stat(dataPath), { maxAttempts: 3, minTimeout: 200 });
+  }
 }
 
 await main();

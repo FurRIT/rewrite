@@ -1,6 +1,6 @@
 {{/* A fragment that will be inserted at runtime - see partials/. */}}
 {{ if hugo.IsDevelopment }}
-  {{ $path := print "target/debug/mock/" . ".html" }}
+  {{ $path := print "develop/partial/" . ".html" }}
   {{ readFile $path | safe.HTML }}
 {{ else }}
   {{ $path := print "partials/" . "/template.html" }}
