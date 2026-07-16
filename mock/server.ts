@@ -1,4 +1,3 @@
-import { delay } from "@std/async/delay";
 import { retry } from "@std/async/retry";
 import { debounce } from "@std/async/debounce";
 import { parseArgs } from "@std/cli/parse-args";
