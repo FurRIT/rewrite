@@ -95,6 +95,27 @@ async function* spawnPartialGenerator(
   }
 }
 
+async function* spawnBackendMock(
+  datadir: string,
+): AsyncGenerator<() => void, void, unknown> {
+  const command = new Deno.Command("deno", {
+    args: ["-A", "mock/server.ts", "--data", datadir],
+    stdin: "piped",
+    stdout: "piped",
+  });
+  const child = command.spawn();
+  yield () => child.kill();
+
+  const lines = child.stdout.pipeThrough(new TextDecoderStream())
+    .pipeThrough(
+      new TextLineStream(),
+    );
+
+  for await (const line of lines) {
+    log.info(`[back] ${line}`);
+  }
+}
+
 async function* spawnHugoGenerator(
   outdir: string,
 ): AsyncGenerator<() => void, void, unknown> {
@@ -157,24 +178,31 @@ async function main() {
   await generateMockData(mockDataOutPath);
 
   const hugo = spawnHugoGenerator(hugoOutDir);
+  const back = spawnBackendMock(mockDataOutPath);
   const partial = spawnPartialGenerator(partialOutDir);
 
   const hugoFirst = await hugo.next();
   assert(!hugoFirst.done);
 
+  const backFirst = await back.next();
+  assert(!backFirst.done);
+
   const partialFirst = await partial.next();
   assert(!partialFirst.done);
 
   const hugoKill = hugoFirst.value;
+  const backKill = backFirst.value;
   const partialKill = partialFirst.value;
 
   await Promise.race([
     hugo.next(),
+    back.next(),
     partial.next(),
   ]);
 
   Deno.addSignalListener("SIGTERM", () => {
     hugoKill();
+    backKill();
     partialKill();
 
     Deno.exit(0);
