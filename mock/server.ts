@@ -165,11 +165,11 @@ async function main() {
       return;
     }
 
-    server.shutdown();
+    await server.shutdown();
     [server, ctx] = await makeServer(dataPath);
   };
 
-  const debounceOnEvent = debounce(onEvent, 200);
+  const debounceOnEvent = debounce(onEvent, 300);
 
   Deno.addSignalListener("SIGINT", async () => {
     console.log("shutting down");
