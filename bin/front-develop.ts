@@ -3,6 +3,7 @@
 import * as log from "@std/log";
 import * as path from "@std/path";
 import { exists } from "@std/fs/exists";
+import { debounce } from "@std/async/debounce";
 import { TextLineStream } from "@std/streams/text-line-stream";
 
 import assert from "node:assert";
@@ -83,6 +84,7 @@ async function* spawnPartialGenerator(
       await Deno.writeFile(targetPath, stdout);
     }
   };
+  const debounceBuild = debounce(build, 200);
 
   const cleanup = () => {
     watcher.close();
@@ -91,7 +93,7 @@ async function* spawnPartialGenerator(
 
   await build();
   for await (const _ of watcher) {
-    await build();
+    debounceBuild();
   }
 }
 
@@ -194,19 +196,26 @@ async function main() {
   const backKill = backFirst.value;
   const partialKill = partialFirst.value;
 
+  const killAll = () => {
+    hugoKill();
+    backKill();
+    partialKill();
+  };
+
+  Deno.addSignalListener("SIGINT", () => {
+    killAll();
+    Deno.exit(0);
+  });
+  Deno.addSignalListener("SIGTERM", () => {
+    killAll();
+    Deno.exit(0);
+  });
+
   await Promise.race([
     hugo.next(),
     back.next(),
     partial.next(),
   ]);
-
-  Deno.addSignalListener("SIGTERM", () => {
-    hugoKill();
-    backKill();
-    partialKill();
-
-    Deno.exit(0);
-  });
 }
 
 await main();
