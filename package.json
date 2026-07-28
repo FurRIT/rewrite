@@ -12,12 +12,16 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "preact": "^10.29.7",
     "@faker-js/faker": "^10.5.0",
     "@tailwindcss/cli": "^4.3.2",
     "http-status-codes": "^2.3.0",
+    "minisearch": "^7.2.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.9.4",
     "prettier-plugin-go-template": "^0.0.15",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "typescript": "^5.9.3",
     "uuid": "^14.0.1"
   }
 }

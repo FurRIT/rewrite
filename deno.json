@@ -1,4 +1,9 @@
 {
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "dom.iterable", "dom.asynciterable"],
+    "jsx": "precompile",
+    "jsxImportSource": "preact"
+  },
   "imports": {
     "@std/async": "jsr:@std/async@^1.5.0",
     "@std/cli": "jsr:@std/cli@^1.0.32",

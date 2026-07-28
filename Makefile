@@ -34,6 +34,11 @@ all: $(TOOL_BINS) frontend $(APP_BINS)
 frontend: $(HUGO_BUILD_DIR)
 	go tool hugo -d $< $(HUGO_GO_BIN_FLAGS)
 
+generate: assets/js/api.schema.d.ts
+
+assets/js/api.schema.d.ts: docs/openapi/api.openapi.yaml
+	npx openapi-typescript $< -o $@
+
 $(APP_BUILD_DIR)/%: $(APP_BUILD_DIR) $(GO_SRCS)
 	go build -o $@ $(patsubst $(APP_BUILD_DIR)/%,cmd/%/main.go,$@)
 
@@ -52,4 +57,4 @@ $(APP_BUILD_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all frontend clean
+.PHONY: all frontend generate clean

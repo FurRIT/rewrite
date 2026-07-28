@@ -1,5 +1,4 @@
 *
 !.gitignore
 
-!js/
-!css/
+!user.tsx

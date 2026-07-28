@@ -14,6 +14,10 @@
       {{ partial "runtime-partial" "csrf" }}
     {{ end }}
 
+    {{ if .Params.search }}
+      {{ partial "search-script" (dict "Entity" .Params.search.entity) }}
+    {{ end }}
+
     {{ with resources.Get "css/fonts.css" }}
       {{ if hugo.IsDevelopment }}
         <link rel="stylesheet" href="{{ .RelPermalink }}" />

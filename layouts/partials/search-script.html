@@ -1,0 +1,37 @@
+{{/* A footer that appears on most pages.
+
+  .Entity - The API search entity (e.g. user; -> /api/users).
+*/}}
+
+{{ $entity := .Entity }}
+{{ $apiUrl := absURL (print "/api/" .Entity "s") }}
+
+{{ if hugo.IsDevelopment }}
+  {{ $apiUrl = (print "http://localhost:8000/api/" .Entity "s") }}
+{{ end }}
+
+{{ with resources.Get "js/search.ts" }}
+  {{ $opts := dict
+    "shims" (dict "component" (print "js/search/" $entity ".tsx"))
+    "params" (dict "url" $apiUrl "entity" $entity)
+    "minify" (cond hugo.IsDevelopment false true)
+    "sourceMap" (cond hugo.IsDevelopment "linked" "none")
+    "inject" (slice "js/jsx-inject.ts")
+    "JSX" "transform"
+    "JSXFactory" "createElement"
+  }}
+  {{ with . | js.Build $opts }}
+    {{ if hugo.IsDevelopment }}
+      <script defer src="{{ .RelPermalink }}"></script>
+    {{ else }}
+      {{ with . | fingerprint }}
+        <script
+          src="{{ .RelPermalink }}"
+          defer
+          integrity="{{ .Data.Integrity }}"
+          crossorigin="anonymous"
+        ></script>
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}

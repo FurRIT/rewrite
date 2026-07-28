@@ -1,0 +1,7 @@
+*
+!.gitignore
+
+!*.ts
+!api.schema.d.ts
+
+!search/

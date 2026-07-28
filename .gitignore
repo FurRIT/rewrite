@@ -20,6 +20,7 @@
 !static/
 
 !deno.json
+!deno.lock
 !package.json
 !package-lock.json
 !.prettierrc.json

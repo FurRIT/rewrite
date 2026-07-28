@@ -1,7 +1,12 @@
+import assert from "node:assert";
+
 import { retry } from "@std/async/retry";
 import { debounce } from "@std/async/debounce";
 import { parseArgs } from "@std/cli/parse-args";
+
+import MiniSearch from "minisearch";
 import { getReasonPhrase } from "http-status-codes";
+
 import { Event, MockData, User } from "./data.ts";
 
 function project<T extends object, K extends keyof T>(
@@ -22,24 +27,37 @@ function project<T extends object, K extends keyof T>(
 function errorResponse(status: number): Response {
   return new Response(
     JSON.stringify({ ok: false, msg: getReasonPhrase(status) }),
-    { status: status },
+    { status: status, headers: CORS_HEADERS },
   );
 }
+
+type ResponseInit = Exclude<
+  ConstructorParameters<typeof Response>[1],
+  undefined
+>;
+
+type ResponseInitHeaders = Exclude<ResponseInit["headers"], undefined>;
+
+const CORS_HEADERS: ResponseInitHeaders = {
+  "Access-Control-Allow-Origin": "http://localhost:1313",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+};
 
 type HandlerCtx = {
   users: Record<string, User>;
   events: Record<string, Event>;
   modifying: boolean;
+  userSearch: MiniSearch<User>;
 };
 
-function makeHandler(indexed: HandlerCtx): (req: Request) => Response {
+function makeHandler(ctx: HandlerCtx): (req: Request) => Response {
   return (req: Request): Response => {
     const url = new URL(req.url);
 
-    if (url.pathname === "/events") {
+    if (url.pathname === "/api/events") {
       const projections = [];
 
-      for (const event of Object.values(indexed.events)) {
+      for (const event of Object.values(ctx.events)) {
         projections.push(
           project(event, [
             "id",
@@ -55,12 +73,23 @@ function makeHandler(indexed: HandlerCtx): (req: Request) => Response {
 
       return new Response(JSON.stringify({ ok: true, events: projections }), {
         status: 200,
+        headers: CORS_HEADERS,
       });
     }
-    if (url.pathname === "/users") {
+    if (url.pathname === "/api/users") {
+      const queryParam = url.searchParams.get("query");
+
+      let results;
+      if (queryParam === null) {
+        results = Object.values(ctx.users);
+      } else {
+        const search = ctx.userSearch.search(queryParam);
+        results = search.map((item) => ctx.users[item.id]);
+      }
+
       const projections = [];
 
-      for (const user of Object.values(indexed.users)) {
+      for (const user of results) {
         projections.push(
           project(user, [
             "id",
@@ -71,38 +100,41 @@ function makeHandler(indexed: HandlerCtx): (req: Request) => Response {
         );
       }
 
-      return new Response(JSON.stringify({ ok: true, events: projections }), {
+      return new Response(JSON.stringify({ ok: true, users: projections }), {
         status: 200,
+        headers: CORS_HEADERS,
       });
     }
 
-    const eventPattern = new URLPattern({ pathname: "/event/:id" });
+    const eventPattern = new URLPattern({ pathname: "/api/event/:id" });
     if (eventPattern.test(req.url)) {
       const match = eventPattern.exec(req.url);
       const id = match?.pathname.groups.id;
 
-      if ((id === undefined) || !(id in indexed.events)) {
+      if ((id === undefined) || !(id in ctx.events)) {
         return errorResponse(404);
       }
 
-      const event = indexed.events[id];
+      const event = ctx.events[id];
       return new Response(JSON.stringify({ ok: true, event: event }), {
         status: 200,
+        headers: CORS_HEADERS,
       });
     }
 
-    const userPattern = new URLPattern({ pathname: "/user/:id" });
+    const userPattern = new URLPattern({ pathname: "/api/user/:id" });
     if (userPattern.test(req.url)) {
       const match = userPattern.exec(req.url);
       const id = match?.pathname.groups.id;
 
-      if ((id === undefined) || !(id in indexed.users)) {
+      if ((id === undefined) || !(id in ctx.users)) {
         return errorResponse(404);
       }
 
-      const user = indexed.users[id];
+      const user = ctx.users[id];
       return new Response(JSON.stringify({ ok: true, user: user }), {
         status: 200,
+        headers: CORS_HEADERS,
       });
     }
     return errorResponse(404);
@@ -130,7 +162,53 @@ async function makeServer(
     indexed.events[event.id] = event;
   }
 
-  const ctx: HandlerCtx = { ...indexed, modifying: false };
+  const userSearch = new MiniSearch({
+    idField: "id",
+    fields: [
+      "name",
+      "telegramUsername",
+      "degrees",
+      "sonaName",
+      "sonaSpecies",
+      "socialHandle",
+    ],
+    // @ts-ignore: specialization that is representative
+    extractField: (
+      document: User,
+      fieldName:
+        | keyof User
+        | "major"
+        | "sonaName"
+        | "sonaSpecies"
+        | "socialHandle",
+    ) => {
+      if (fieldName in document) {
+        // @ts-ignore: issue with resolution
+        return document[fieldName];
+      }
+
+      if (fieldName === "major") {
+        return document.degrees.join(" ");
+      }
+      if (fieldName === "sonaName") {
+        return document.sonas.map((sona) => sona.name).join(" ");
+      }
+      if (fieldName === "sonaSpecies") {
+        return document.sonas.map((sona) => sona.species).join(" ");
+      }
+      if (fieldName === "socialHandle") {
+        return document.socials.map((social) => social.handle).join(" ");
+      }
+
+      assert(false);
+    },
+    searchOptions: {
+      prefix: true,
+    },
+  });
+  userSearch.addAll(mock.users);
+
+  const ctx: HandlerCtx = { ...indexed, userSearch, modifying: false };
   return [
     Deno.serve({
       onListen({ port, hostname }) {
