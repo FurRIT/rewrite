@@ -305,6 +305,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/media/{mediaId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Media Identifier. */
+                mediaId: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Get a media asset.
+         * @description Get a single media asset.
+         */
+        get: operations["getMedia"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -332,6 +355,11 @@ export interface components {
             /** Format: int64 */
             class: number | null;
         };
+        /** @description User connection with profile picture media. */
+        UserProfilePictureConnection: {
+            /** Format: path */
+            profilePicture: string;
+        };
         /** @description Detailed User information; superset of SparseUserInfo. */
         DetailedUserInfo: components["schemas"]["SparseUserInfo"] & {
             /** Format: .* */
@@ -346,6 +374,8 @@ export interface components {
         } & components["schemas"]["StubUserInfo"];
         /** @description A sparse User record. */
         SparseUser: components["schemas"]["StubUser"] & components["schemas"]["SparseUserInfo"];
+        /** @description A sparse User record with profile picture. */
+        SparseUserWithProfilePicture: components["schemas"]["SparseUser"] & components["schemas"]["UserProfilePictureConnection"];
         /** @description A detailed User record. */
         DetailedUser: components["schemas"]["SparseUser"] & components["schemas"]["DetailedUserInfo"];
         /** @description Sparse information about a Sona. */
@@ -366,7 +396,7 @@ export interface components {
         UserConnections: {
             sonas: components["schemas"]["SparseSona"][];
             socials: components["schemas"]["SparseSocial"][];
-        };
+        } & components["schemas"]["UserProfilePictureConnection"];
         /** @description -| Specialization of DetailedUserInfo where all fields are optional. */
         DetailedUserInfoPartial: components["schemas"]["DetailedUserInfo"];
         /** @description A detailed User paired with User connections. */
@@ -702,7 +732,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Ok"] & {
-                        users: components["schemas"]["SparseUser"][];
+                        users: components["schemas"]["SparseUserWithProfilePicture"][];
                     };
                 };
             };
@@ -1132,6 +1162,36 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            400: components["responses"]["BadRequestError"];
+            401: components["responses"]["UnauthorizedError"];
+            403: components["responses"]["ForbiddenError"];
+            404: components["responses"]["NotFoundError"];
+            429: components["responses"]["TooManyRequestsError"];
+            500: components["responses"]["InternalServerErrorError"];
+        };
+    };
+    getMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Media Identifier. */
+                mediaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The media asset. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
             };
             400: components["responses"]["BadRequestError"];
             401: components["responses"]["UnauthorizedError"];

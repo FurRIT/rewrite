@@ -5,15 +5,21 @@
 
 {{ $entity := .Entity }}
 {{ $apiUrl := absURL (print "/api/" .Entity "s") }}
+{{ $apiBase := absURL "/api" }}
+{{ $siteBase := absURL "" }}
 
 {{ if hugo.IsDevelopment }}
   {{ $apiUrl = (print "http://localhost:8000/api/" .Entity "s") }}
 {{ end }}
 
+{{ if hugo.IsDevelopment }}
+  {{ $apiBase = (print "http://localhost:8000/api" ) }}
+{{ end }}
+
 {{ with resources.Get "js/search.ts" }}
   {{ $opts := dict
     "shims" (dict "component" (print "js/search/" $entity ".tsx"))
-    "params" (dict "url" $apiUrl "entity" $entity)
+    "params" (dict "url" $apiUrl "entity" $entity "apiBase" $apiBase "siteBase" $siteBase)
     "minify" (cond hugo.IsDevelopment false true)
     "sourceMap" (cond hugo.IsDevelopment "linked" "none")
     "inject" (slice "js/jsx-inject.ts")

@@ -98,10 +98,11 @@ async function* spawnPartialGenerator(
 }
 
 async function* spawnBackendMock(
-  datadir: string,
+  dataPath: string,
+  mediaPath: string,
 ): AsyncGenerator<() => void, void, unknown> {
   const command = new Deno.Command("deno", {
-    args: ["-A", "mock/server.ts", "--data", datadir],
+    args: ["-A", "mock/server.ts", "--data", dataPath, "--media", mediaPath],
     stdin: "piped",
     stdout: "piped",
   });
@@ -139,9 +140,9 @@ async function* spawnHugoGenerator(
   }
 }
 
-async function generateMockData(outpath: string) {
+async function generateMockData(dataOutpath: string, mediaOutpath: string) {
   const command = new Deno.Command(Deno.execPath(), {
-    args: ["-A", "mock/data.ts", "-o", outpath],
+    args: ["-A", "mock/data.ts", "-d", dataOutpath, "-m", mediaOutpath],
     stdin: "null",
     stderr: "piped",
     stdout: "piped",
@@ -151,8 +152,8 @@ async function generateMockData(outpath: string) {
   const { code } = await child.output();
   assert(code === 0);
 
-  const fancy = path.relative(REPO_ROOT_DIR_PATH, outpath);
-  log.info(`[mock] created data file ${fancy}`);
+  const dataOutpathFancy = path.relative(REPO_ROOT_DIR_PATH, dataOutpath);
+  log.info(`[mock] created data file ${dataOutpathFancy}`);
 }
 
 const OUTPUT_DIR = path.join(REPO_ROOT_DIR_PATH, "develop");
@@ -173,14 +174,25 @@ async function main() {
   const hugoOutDir = path.join(OUTPUT_DIR, "hugo");
   const partialOutDir = path.join(OUTPUT_DIR, "partial");
   const mockDataOutPath = path.join(OUTPUT_DIR, "data.json");
+  const mockMediaOutPath = path.join(OUTPUT_DIR, "media");
 
-  Deno.mkdir(hugoOutDir, { recursive: true });
-  Deno.mkdir(partialOutDir, { recursive: true });
+  try {
+    // Remove the mock media directory to prevent exponential growth.
+    if (await Deno.stat(mockMediaOutPath)) {
+      await Deno.remove(mockMediaOutPath, { recursive: true });
+    }
+  } catch {
+    // Ignore a stat failure - the directory probably doesn't exist.
+  }
 
-  await generateMockData(mockDataOutPath);
+  await Deno.mkdir(hugoOutDir, { recursive: true });
+  await Deno.mkdir(partialOutDir, { recursive: true });
+  await Deno.mkdir(mockMediaOutPath, { recursive: true });
+
+  await generateMockData(mockDataOutPath, mockMediaOutPath);
 
   const hugo = spawnHugoGenerator(hugoOutDir);
-  const back = spawnBackendMock(mockDataOutPath);
+  const back = spawnBackendMock(mockDataOutPath, mockMediaOutPath);
   const partial = spawnPartialGenerator(partialOutDir);
 
   const hugoFirst = await hugo.next();

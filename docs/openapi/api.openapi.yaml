@@ -19,6 +19,8 @@ tags:
     description: Registration management endpoints.
   - name: sessions
     description: Session management endpoints.
+  - name: medias
+    description: Media management endpoints.
   - name: infos
     description: Static information endpoints.
   - name: users
@@ -281,7 +283,7 @@ paths:
                       users:
                         type: array
                         items:
-                          $ref: "#/components/schemas/SparseUser"
+                          $ref: "#/components/schemas/SparseUserWithProfilePicture"
                     required:
                       - users
                 examples:
@@ -292,6 +294,7 @@ paths:
                         degrees:
                           - "Software Engineering BS"
                         class: 2025
+                        profilePicture: "/media/f97eed11a07cdc0c0c173f97634b8d7020ac94914a22f9ddf0327215a845163e"
         "400":
           $ref: "#/components/responses/BadRequestError"
         "401":
@@ -355,6 +358,7 @@ paths:
                       socials:
                         - platform: "Discord"
                           handle: "@mrwolf"
+                      profilePicture: "/media/f97eed11a07cdc0c0c173f97634b8d7020ac94914a22f9ddf0327215a845163e"
         "400":
           $ref: "#/components/responses/BadRequestError"
         "401":
@@ -925,6 +929,50 @@ paths:
           $ref: "#/components/responses/TooManyRequestsError"
         "500":
           $ref: "#/components/responses/InternalServerErrorError"
+  /media/{mediaId}:
+    parameters:
+      - in: path
+        name: mediaId
+        schema:
+          type: string
+          minLength: 64
+          maxLength: 64
+          format: hash
+        required: true
+        description: Media Identifier.
+    get:
+      summary: Get a media asset.
+      tags:
+        - medias
+      operationId: getMedia
+      description: |-
+        Get a single media asset.
+      responses:
+        "200":
+          description: The media asset.
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+          x-err-condition: The requesting User is disabled.
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+          x-err-condition: The media doesn't exist.
+        "429":
+          $ref: "#/components/responses/TooManyRequestsError"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorError"
 
 components:
   parameters:
@@ -990,6 +1038,15 @@ components:
           required:
             - degrees
             - class
+    UserProfilePictureConnection:
+      description: User connection with profile picture media.
+      type: object
+      properties:
+        profilePicture:
+          type: string
+          format: path
+      required:
+        - profilePicture
     DetailedUserInfo:
       description: Detailed User information; superset of SparseUserInfo.
       allOf:
@@ -1021,6 +1078,11 @@ components:
       allOf:
         - $ref: "#/components/schemas/StubUser"
         - $ref: "#/components/schemas/SparseUserInfo"
+    SparseUserWithProfilePicture:
+      description: A sparse User record with profile picture.
+      allOf:
+        - $ref: "#/components/schemas/SparseUser"
+        - $ref: "#/components/schemas/UserProfilePictureConnection"
     DetailedUser:
       description: A detailed User record.
       allOf:
@@ -1052,19 +1114,21 @@ components:
         - handle
     UserConnections:
       description: Connections with items related to a User.
-      type: object
-      properties:
-        sonas:
-          type: array
-          items:
-            $ref: "#/components/schemas/SparseSona"
-        socials:
-          type: array
-          items:
-            $ref: "#/components/schemas/SparseSocial"
-      required:
-        - sonas
-        - socials
+      allOf:
+        - type: object
+          properties:
+            sonas:
+              type: array
+              items:
+                $ref: "#/components/schemas/SparseSona"
+            socials:
+              type: array
+              items:
+                $ref: "#/components/schemas/SparseSocial"
+          required:
+            - sonas
+            - socials
+        - $ref: "#/components/schemas/UserProfilePictureConnection"
     DetailedUserInfoPartial:
       description: -|
         Specialization of DetailedUserInfo where all fields are optional.

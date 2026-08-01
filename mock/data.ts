@@ -1,3 +1,5 @@
+import assert from "node:assert";
+import * as path from "@std/path";
 import { parseArgs } from "@std/cli/parse-args";
 
 import { v4 as uuidv4 } from "uuid";
@@ -166,6 +168,7 @@ export type User = {
   name: string;
   degrees: string[];
   class: number | null;
+  profilePicture: string;
   aboutMe: string;
   telegramUsername: string;
   sonas: { name: string; species: string }[];
@@ -198,15 +201,13 @@ export type MockData = {
 const N_RANDOM_USERS = 20;
 const N_RANDOM_EVENTS = 3;
 
-function capitalize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 function randomchoice<T>(...items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-function randomUser(): User {
+type UserWithoutProfilePicture = Omit<User, "profilePicture">;
+
+function randomUser(): UserWithoutProfilePicture {
   return {
     "id": uuidv4(),
     "name": faker.person.firstName(),
@@ -259,6 +260,41 @@ function randomUser(): User {
       },
     ],
   };
+}
+
+async function randomUserProfilePicture(
+  mediaPath: string,
+): Promise<string> {
+  const url = faker.image.urlPicsumPhotos({ width: 256, height: 256 });
+
+  const response = await fetch(url);
+  assert(response.ok && response.body !== null);
+
+  let hash: string;
+  {
+    const arrbuff = await response.arrayBuffer();
+    const buffer = new Uint8Array(arrbuff);
+
+    const command = new Deno.Command("b3sum", {
+      args: ["-"],
+      stdin: "piped",
+      stdout: "piped",
+    });
+    const child = command.spawn();
+
+    const writer = child.stdin.getWriter();
+
+    await writer.write(buffer);
+    await writer.close();
+
+    hash = await child.stdout.text();
+    hash = hash.slice(0, -4);
+
+    const target = path.join(mediaPath, hash);
+    await Deno.writeFile(target, buffer);
+  }
+
+  return `/media/${hash}`;
 }
 
 function randomEvent(usersMap: Record<string, User>): Event {
@@ -323,18 +359,46 @@ function randomEvent(usersMap: Record<string, User>): Event {
 
 async function main() {
   const flags = parseArgs(Deno.args, {
-    alias: { output: "o" },
-    string: ["output"],
+    alias: { data: "d", media: "m" },
+    string: ["data", "media"],
     default: {
-      output: null,
+      data: null,
+      media: null,
     },
   });
+
+  if (flags.data === null) {
+    console.error("-d, --data must be defined");
+    Deno.exit(1);
+  }
+  if (flags.media === null) {
+    console.error("-m, --media must be defined");
+    Deno.exit(1);
+  }
 
   const usersMap: Record<string, User> = {};
   const events: Event[] = [];
 
+  const userPartials: UserWithoutProfilePicture[] = [];
+
   for (let i = 0; i < N_RANDOM_USERS; i++) {
-    const user = randomUser();
+    const partial = randomUser();
+    userPartials.push(partial);
+  }
+
+  async function fetchProfilePicture(
+    partial: UserWithoutProfilePicture,
+  ): Promise<User> {
+    assert(flags.media !== null);
+
+    const profilePicture = await randomUserProfilePicture(flags.media);
+    return { ...partial, profilePicture };
+  }
+
+  const users = await Promise.all(
+    userPartials.map((partial) => fetchProfilePicture(partial)),
+  );
+  for (const user of users) {
     usersMap[user.id] = user;
   }
 
@@ -344,12 +408,7 @@ async function main() {
   }
 
   const ser = JSON.stringify({ users: Object.values(usersMap), events });
-
-  if (flags.output !== null) {
-    await Deno.writeTextFile(flags.output, ser);
-  } else {
-    process.stdout.write(ser);
-  }
+  await Deno.writeTextFile(flags.data, ser);
 }
 
 await main();

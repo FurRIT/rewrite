@@ -1,41 +1,63 @@
 import { components } from "../api.schema.d.ts";
 
-type SparseUser = components["schemas"]["SparseUser"];
+import * as params from "@params";
+
+const API_BASE: string = params.apiBase;
+const SITE_BASE: string = params.siteBase;
+
+type SparseUserWithProfilePicture =
+  components["schemas"]["SparseUserWithProfilePicture"];
+
+// The maximum length of the degrees field for a user; calibrated from:
+// `max(degree_name.length) + (3/4 * avg(degree_name.length))`; minus three from
+// the ellipsis substitution.
+const MAX_DEGREES_LENGTH = 71;
 
 function Degrees(props: { degrees: string[] }) {
+  const header = props.degrees.length === 1 ? "Major" : "Majors";
+
+  let value = props.degrees.join(", ");
   if (props.degrees.length === 0) {
-    return <div></div>;
+    value = "[?]";
   }
 
-  const major = props.degrees.length === 1 ? "Major" : "Majors";
-  const joined = props.degrees.join(", ");
+  if (value.length > MAX_DEGREES_LENGTH) {
+    value = value.slice(0, MAX_DEGREES_LENGTH) + "...";
+  }
 
   return (
-    <div>
-      <strong>{major}</strong> {joined}
+    <div class="mx-auto px-3 text-center">
+      <strong>{header}</strong> {value}
     </div>
   );
 }
 
 function Class(props: { classYear: number | null }) {
-  console.log(props);
-  if (props.classYear === null) {
-    return <div></div>;
-  }
+  const value = props.classYear === null ? "[?]" : props.classYear;
 
   return (
-    <div>
-      <strong>Class of</strong> {props.classYear}
+    <div class="mx-auto px-3 text-center">
+      <strong>Class of</strong> {value}
     </div>
   );
 }
 
-export default function User(props: { user: SparseUser }) {
+export default function User(props: { user: SparseUserWithProfilePicture }) {
+  const imageUrl = `${API_BASE}${props.user.profilePicture}`;
+  const userUrl = `${SITE_BASE}user/${props.user.id}`;
+
   return (
-    <div class="p-auto mx-auto h-32 w-[100%] rounded-xl bg-white sm:h-64 sm:w-[50%] md:h-64 md:w-[40%] lg:h-64 lg:w-[30%]">
-      <h3>{props.user.name}</h3>
+    <a
+      class="mx-auto w-[60%] rounded-xl bg-(--legacy-color-warm-gray-80) pb-3 sm:w-[50%] md:w-[40%] lg:w-[30%]"
+      href={userUrl}
+    >
+      <img
+        class="mx-auto mt-3 mb-2 rounded-xs border-3 border-white sm:w-[50%] lg:w-[75%]"
+        src={imageUrl}
+      />
+      <h3 class="mx-auto text-center">{props.user.name}</h3>
       <Degrees degrees={props.user.degrees} />
       <Class classYear={props.user.class} />
-    </div>
+    </a>
   );
 }

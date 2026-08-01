@@ -17,6 +17,7 @@ pkgs.mkShellNoCC {
 
     # mock
     deno
+    b3sum
 
     # docs/
     # vacuum; newer version installed using Go tool

@@ -1,11 +1,13 @@
 import assert from "node:assert";
 
+import * as path from "@std/path";
 import { retry } from "@std/async/retry";
 import { debounce } from "@std/async/debounce";
 import { parseArgs } from "@std/cli/parse-args";
 
 import MiniSearch from "minisearch";
 import { getReasonPhrase } from "http-status-codes";
+import { fileTypeFromBuffer } from "file-type";
 
 import { Event, MockData, User } from "./data.ts";
 
@@ -48,10 +50,11 @@ type HandlerCtx = {
   events: Record<string, Event>;
   modifying: boolean;
   userSearch: MiniSearch<User>;
+  mediaPath: string;
 };
 
-function makeHandler(ctx: HandlerCtx): (req: Request) => Response {
-  return (req: Request): Response => {
+function makeHandler(ctx: HandlerCtx): (req: Request) => Promise<Response> {
+  return async (req: Request): Promise<Response> => {
     const url = new URL(req.url);
 
     if (url.pathname === "/api/events") {
@@ -96,6 +99,7 @@ function makeHandler(ctx: HandlerCtx): (req: Request) => Response {
             "name",
             "degrees",
             "class",
+            "profilePicture",
           ]),
         );
       }
@@ -137,17 +141,51 @@ function makeHandler(ctx: HandlerCtx): (req: Request) => Response {
         headers: CORS_HEADERS,
       });
     }
+
+    const mediaPattern = new URLPattern({ pathname: "/api/media/:id" });
+    if (mediaPattern.test(req.url)) {
+      const match = mediaPattern.exec(req.url);
+      const id = match?.pathname.groups.id;
+
+      const entries = new Set();
+      const lister = Deno.readDir(ctx.mediaPath);
+
+      for await (const entry of lister) {
+        if (!entry.isFile) {
+          continue;
+        }
+
+        entries.add(entry.name);
+      }
+
+      if ((id === undefined) || !(entries.has(id))) {
+        return errorResponse(404);
+      }
+
+      const source = path.join(ctx.mediaPath, id);
+      const buffer = await Deno.readFile(source);
+
+      const result = await fileTypeFromBuffer(buffer);
+      assert(result !== undefined);
+
+      return new Response(buffer, {
+        status: 200,
+        headers: { ...CORS_HEADERS, "Content-Type": result.mime },
+      });
+    }
+
     return errorResponse(404);
   };
 }
 
 async function makeServer(
-  path: string,
+  dataPath: string,
+  mediaPath: string,
 ): Promise<[Deno.HttpServer<Deno.Addr>, HandlerCtx]> {
   let mock: MockData | null = null;
 
   {
-    const text = await Deno.readTextFile(path);
+    const text = await Deno.readTextFile(dataPath);
     mock = JSON.parse(text) as MockData;
   }
 
@@ -208,7 +246,12 @@ async function makeServer(
   });
   userSearch.addAll(mock.users);
 
-  const ctx: HandlerCtx = { ...indexed, userSearch, modifying: false };
+  const ctx: HandlerCtx = {
+    ...indexed,
+    userSearch,
+    modifying: false,
+    mediaPath,
+  };
   return [
     Deno.serve({
       onListen({ port, hostname }) {
@@ -221,10 +264,11 @@ async function makeServer(
 
 async function main() {
   const flags = parseArgs(Deno.args, {
-    alias: { data: "d" },
-    string: ["data"],
+    alias: { data: "d", media: "m" },
+    string: ["data", "media"],
     default: {
       data: null,
+      media: null,
     },
   });
 
@@ -232,9 +276,14 @@ async function main() {
     console.error("error: -d, --data must be provided");
     process.exit(1);
   }
+  if (flags.media === null) {
+    console.error("error: -m, --media must be provided");
+    process.exit(1);
+  }
   const dataPath: string = flags.data;
+  const mediaPath: string = flags.media;
 
-  let [server, ctx] = await makeServer(dataPath);
+  let [server, ctx] = await makeServer(dataPath, mediaPath);
 
   const onEvent = async (_: Deno.FsEvent) => {
     console.log(dataPath, "modified; reloading...");
@@ -243,7 +292,7 @@ async function main() {
     }
 
     await server.shutdown();
-    [server, ctx] = await makeServer(dataPath);
+    [server, ctx] = await makeServer(dataPath, mediaPath);
   };
 
   const debounceOnEvent = debounce(onEvent, 300);
