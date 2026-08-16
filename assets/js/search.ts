@@ -1,4 +1,4 @@
-type SearchableEntityName = "user";
+type SearchableEntityName = "user" | "event";
 type SearchableEntityNamePlural = `${SearchableEntityName}s`;
 
 type SearchEndpoint = `/${SearchableEntityNamePlural}`;

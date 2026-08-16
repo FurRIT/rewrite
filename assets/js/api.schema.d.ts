@@ -441,14 +441,11 @@ export interface components {
             dtstart?: string;
             /** Format: date-time */
             dtend?: string;
-        };
-        /** @description Detailed Event information; superset of SparseEventInfo. */
-        DetailedEventInfo: {
             /** Format: .* */
             description: string | null;
-        } & components["schemas"]["SparseEventInfo"];
-        /** @description DetailedEventInfo with no required fields. */
-        PartialDetailedEventInfo: components["schemas"]["DetailedEventInfo"];
+        };
+        /** @description SparseEventInfo with no required fields. */
+        PartialSparseEventInfo: components["schemas"]["SparseEventInfo"];
         /** @description Sparse Event record. */
         SparseEventWithOrganizer: {
             /** Format: uuid */
@@ -458,7 +455,7 @@ export interface components {
         DetailedEvent: {
             /** Format: uuid */
             id: string;
-        } & components["schemas"]["DetailedEventInfo"] & components["schemas"]["EventOrganizerConnection"] & components["schemas"]["EventRsvpConnections"];
+        } & components["schemas"]["SparseEventInfo"] & components["schemas"]["EventOrganizerConnection"] & components["schemas"]["EventRsvpConnections"];
     };
     responses: {
         /** @description Bad Request. */
@@ -904,7 +901,7 @@ export interface operations {
         /** @description Full Event information. */
         requestBody: {
             content: {
-                "application/json": components["schemas"]["DetailedEventInfo"];
+                "application/json": components["schemas"]["SparseEventInfo"];
             };
         };
         responses: {
@@ -1010,7 +1007,7 @@ export interface operations {
         /** @description Partial Event information. */
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PartialDetailedEventInfo"];
+                "application/json": components["schemas"]["PartialSparseEventInfo"];
             };
         };
         responses: {
@@ -1021,7 +1018,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Ok"] & {
-                        event: components["schemas"]["DetailedEventInfo"];
+                        event: components["schemas"]["SparseEventInfo"];
                     };
                 };
             };

@@ -19,7 +19,7 @@ collected. This type of information includes your name, e-mail address, and
 birthday, and can also include your residential address, gender, and any other
 information that can be used to contact you or identify you as an individual.
 This type of information is collected when you register for membership and fill
-out your profile; however—outside of the registration process—sharing is always
+out your profile; however-outside of the registration process-sharing is always
 opt-in in order to use FurRIT.
 
 FurRIT also collects "Anonymous Information" for the standard procedure of
@@ -76,7 +76,7 @@ websites. We have no control over, and assume no responsibility for the content,
 privacy policies, or practices of any third-party sites or services.
 
 FurRIT currently does not have any third-party affiliations and does not share
-any information—personal or anonymous—with any other party or service.
+any information-personal or anonymous-with any other party or service.
 
 ## Children
 

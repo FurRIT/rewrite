@@ -201,6 +201,10 @@ export type MockData = {
 const N_RANDOM_USERS = 20;
 const N_RANDOM_EVENTS = 3;
 
+function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function randomchoice<T>(...items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -340,18 +344,23 @@ function randomEvent(usersMap: Record<string, User>): Event {
     rsvps.push(randomRsvp());
   }
 
+  const summary = capitalize(faker.word.adjective()) + " " +
+    capitalize(faker.word.verb()) +
+    randomchoice(" At The ", " Near The ", " By The ") +
+    capitalize(faker.word.noun());
+
   return {
     "id": uuidv4(),
     "description": faker.lorem.paragraph(),
-    "summary": faker.lorem.words({ min: 5, max: 10 }),
+    "summary": summary,
     "location": randomchoice(() => "online", faker.location.streetAddress)(),
     "status": faker.helpers.arrayElement([
       "canceled",
       "tentative",
       "confirmed",
     ]),
-    "dtstart": startDateTime.toString(),
-    "dtend": endDateTime.toString(),
+    "dtstart": startDateTime.toZonedDateTime("America/New_York").toString(),
+    "dtend": endDateTime.toZonedDateTime("America/New_York").toString(),
     "organizer": { "id": organizer.id, "name": organizer.name },
     "rsvps": rsvps,
   };

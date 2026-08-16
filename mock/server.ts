@@ -70,6 +70,7 @@ function makeHandler(ctx: HandlerCtx): (req: Request) => Promise<Response> {
             "dtstart",
             "dtend",
             "organizer",
+            "description",
           ]),
         );
       }

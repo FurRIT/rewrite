@@ -525,8 +525,8 @@ paths:
                         summary: "Game Awards 2026 Watch Party!"
                         location: "online"
                         status: "confirmed"
-                        dtstart: "2026-12-10T19:30:00-0500"
-                        dtend: "2026-12-10T22:30:00-0500"
+                        dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
+                        dtend: "2026-12-10T15:15:00.000000096-04:00[America/New_York]"
                         organizer:
                           id: "5f3bdd7a-c346-4a26-9754-97cadfaacaca"
                           name: "Mr. Wolfy"
@@ -557,14 +557,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DetailedEventInfo"
+              $ref: "#/components/schemas/SparseEventInfo"
               examples:
                 - description: "Time for all of us to get together and watch! Make sure to minimize mic noise!"
                   summary: "Game Awards 2026 Watch Party!"
                   location: "online"
                   status: "confirmed"
-                  dtstart: "2026-12-10T19:30:00-0500"
-                  dtend: "2026-12-10T22:30:00-0500"
+                  dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
+                  dtend: "2026-12-10T15:15:00.000000096-04:00[America/New_York]"
       responses:
         "200":
           description: The updated Event details.
@@ -635,8 +635,8 @@ paths:
                       summary: "Game Awards 2026 Watch Party!"
                       location: "online"
                       status: "confirmed"
-                      dtstart: "2026-12-10T19:30:00-0500"
-                      dtend: "2026-12-10T22:30:00-0500"
+                      dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
+                      dtend: "2026-12-10T15:15:00.000000096-04:00[America/New_York]"
                       organizer:
                         id: "5f3bdd7a-c346-4a26-9754-97cadfaacaca"
                         name: "Mr. Wolfy"
@@ -679,7 +679,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PartialDetailedEventInfo"
+              $ref: "#/components/schemas/PartialSparseEventInfo"
               examples:
                 - description: "Watch party time!"
       responses:
@@ -693,7 +693,7 @@ paths:
                   - type: object
                     properties:
                       event:
-                        $ref: "#/components/schemas/DetailedEventInfo"
+                        $ref: "#/components/schemas/SparseEventInfo"
                     required:
                       - event
                 examples:
@@ -704,8 +704,8 @@ paths:
                       summary: "Game Awards 2026 Watch Party!"
                       location: "online"
                       status: "confirmed"
-                      dtstart: "2026-12-10T19:30:00-0500"
-                      dtend: "2026-12-10T22:30:00-0500"
+                      dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
+                      dtend: "2026-12-10T15:15:00.000000096-04:00[America/New_York]"
         "400":
           $ref: "#/components/responses/BadRequestError"
         "401":
@@ -1216,27 +1216,22 @@ components:
         dtstart:
           type: string
           format: date-time
+          description: An RFC 9557 format string.
         dtend:
           type: string
           format: date-time
+          description: An RFC 9557 format string.
+        description:
+          type: [string, "null"]
+          format: ".*"
       required:
         - summary
         - location
         - status
-    DetailedEventInfo:
-      description: Detailed Event information; superset of SparseEventInfo.
-      allOf:
-        - type: object
-          properties:
-            description:
-              type: [string, "null"]
-              format: ".*"
-          required:
-            - description
-        - $ref: "#/components/schemas/SparseEventInfo"
-    PartialDetailedEventInfo:
-      description: DetailedEventInfo with no required fields.
-      $ref: "#/components/schemas/DetailedEventInfo"
+        - description
+    PartialSparseEventInfo:
+      description: SparseEventInfo with no required fields.
+      $ref: "#/components/schemas/SparseEventInfo"
       required: []
     SparseEventWithOrganizer:
       description: Sparse Event record.
@@ -1261,7 +1256,7 @@ components:
               format: uuid
           required:
             - id
-        - $ref: "#/components/schemas/DetailedEventInfo"
+        - $ref: "#/components/schemas/SparseEventInfo"
         - $ref: "#/components/schemas/EventOrganizerConnection"
         - $ref: "#/components/schemas/EventRsvpConnections"
 

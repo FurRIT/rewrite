@@ -13,7 +13,7 @@
 {{ end }}
 
 {{ if hugo.IsDevelopment }}
-  {{ $apiBase = (print "http://localhost:8000/api" ) }}
+  {{ $apiBase = (print "http://localhost:8000/api") }}
 {{ end }}
 
 {{ with resources.Get "js/search.ts" }}
@@ -25,6 +25,7 @@
     "inject" (slice "js/jsx-inject.ts")
     "JSX" "transform"
     "JSXFactory" "createElement"
+    "targetPath" (print "js/search-" $entity ".js")
   }}
   {{ with . | js.Build $opts }}
     {{ if hugo.IsDevelopment }}

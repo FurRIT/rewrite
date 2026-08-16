@@ -14,16 +14,30 @@
     {{ partial "textbox" (dict "Id" "location" "Placeholder" "Location..." "Class" "block") }}
 
 
+    <div class="mx-auto flex flex-row flex-nowrap gap-2">
+      <strong>Online?</strong>
+      <input type="checkbox" id="isonline" />
+    </div>
+
     <div
       class="flex w-full flex-row flex-nowrap justify-center [&_h2]:mx-auto [&_h2]:text-center"
     >
       <div>
-        <h2>Start</h2>
-        <input type="datetime-local" id="start" />
+        <h2>Date</h2>
+        <input type="date" id="date" />
       </div>
-      <div>
-        <h2>End</h2>
-        <input type="datetime-local" id="end" />
+    </div>
+
+    <div
+      class="flex w-full flex-row flex-nowrap justify-center gap-4 [&_h2]:mx-auto [&_h2]:text-center"
+    >
+      <div class="flex flex-col flex-nowrap items-center justify-center">
+        <h2>Start Time</h2>
+        <input type="time" id="start" />
+      </div>
+      <div class="flex flex-col flex-nowrap items-center justify-center">
+        <h2>End Time</h2>
+        <input type="time" id="end" />
       </div>
     </div>
 
