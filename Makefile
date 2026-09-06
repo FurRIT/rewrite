@@ -34,7 +34,10 @@ all: $(TOOL_BINS) frontend $(APP_BINS)
 frontend: $(HUGO_BUILD_DIR)
 	go tool hugo -d $< $(HUGO_GO_BIN_FLAGS)
 
-generate: assets/js/api.schema.d.ts
+generate: assets/js/api.schema.d.ts mock/api.schema.d.ts
+
+mock/api.schema.d.ts: docs/openapi/api.openapi.yaml
+	npx openapi-typescript $< -o $@
 
 assets/js/api.schema.d.ts: docs/openapi/api.openapi.yaml
 	npx openapi-typescript $< -o $@

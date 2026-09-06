@@ -1,5 +1,7 @@
 *
 !.gitignore
 
+!api.schema.d.ts
+
 !server.ts
 !data.ts

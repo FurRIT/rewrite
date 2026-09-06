@@ -1,0 +1,12 @@
+{{/* A header that appears on most pages.
+
+  .SizeClass - The size of the page (optional default normal).
+*/}}
+{{ $size := default "page-box-normal" .SizeClass }}
+
+
+<div class="{{ $size }} mx-auto" id="toast-anchor">
+  <div
+    class="{{ $size }} absolute flex flex-col flex-nowrap justify-items-center"
+  ></div>
+</div>

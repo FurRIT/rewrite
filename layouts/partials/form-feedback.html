@@ -1,0 +1,18 @@
+{{/* A hook for feedback on a form field.
+
+  .Id - The identifier of the adjacent input element.
+  .Debug - Whether or not to enable debugging.
+*/}}
+
+{{ $id := (print .Id "-feedback") }}
+{{ $debug := index . "Debug" | default false }}
+
+
+<div
+  id="{{ $id }}"
+  class="[&_p]:text-base [&_p]:font-medium [&_p]:text-red-700"
+>
+  {{ if $debug }}
+    <p>* Invalid form field.</p>
+  {{ end }}
+</div>

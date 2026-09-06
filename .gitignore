@@ -25,6 +25,8 @@
 !package-lock.json
 !.prettierrc.json
 
+!tailwind.config.js
+
 !internal/
 
 !partials/

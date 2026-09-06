@@ -2,53 +2,76 @@
   {{ partial "navbar" }}
   {{ partial "header" (dict "Title" "New Event") }}
 
+  {{ partial "toast-anchor" }}
+
 
   <main
     class="page-box-normal white-main-box body-text flex flex-col flex-nowrap *:mb-2 [&_h2]:text-xl [&_h2]:font-bold"
   >
     <h2>Title</h2>
-    {{ partial "textbox" (dict "Id" "summary" "Type" "text" "Placeholder" "Summary..." "Class" "block") }}
-
+    <div>
+      {{ partial "textbox" (dict "Id" "title" "Type" "text" "Placeholder" "Title..." "Class" "block w-full") }}
+      {{ partial "form-feedback" (dict "Id" "title") }}
+    </div>
 
     <h2>Location</h2>
-    {{ partial "textbox" (dict "Id" "location" "Placeholder" "Location..." "Class" "block") }}
+    <div>
+      {{ partial "textbox" (dict "Id" "location" "Placeholder" "Location..." "Class" "block w-full") }}
+      {{ partial "form-feedback" (dict "Id" "location") }}
+    </div>
 
-
-    <div class="mx-auto flex flex-row flex-nowrap gap-2">
-      <strong>Online?</strong>
-      <input type="checkbox" id="isonline" />
+    <div class="flex flex-col flex-nowrap content-center *:mx-auto">
+      <div class="flex flex-row flex-nowrap gap-2">
+        <strong>Online?</strong>
+        <input type="checkbox" id="isonline" />
+      </div>
+      {{ partial "form-feedback" (dict "Id" "isonline") }}
     </div>
 
     <div
-      class="flex w-full flex-row flex-nowrap justify-center [&_h2]:mx-auto [&_h2]:text-center"
+      class="flex w-full flex-col flex-nowrap justify-center *:mx-auto [&_h2]:text-center"
     >
-      <div>
-        <h2>Date</h2>
-        <input type="date" id="date" />
-      </div>
+      <h2>Date</h2>
+      <input type="date" id="date" />
+      {{ partial "form-feedback" (dict "Id" "date") }}
     </div>
 
     <div
       class="flex w-full flex-row flex-nowrap justify-center gap-4 [&_h2]:mx-auto [&_h2]:text-center"
     >
-      <div class="flex flex-col flex-nowrap items-center justify-center">
-        <h2>Start Time</h2>
+      <div
+        class="flex w-40 flex-col flex-nowrap items-center justify-start justify-center gap-2"
+      >
+        <h2 class="mt-0! place-self-start">Start Time</h2>
         <input type="time" id="start" />
+        <div class="*:text-center">
+          {{ partial "form-feedback" (dict "Id" "start") }}
+        </div>
       </div>
-      <div class="flex flex-col flex-nowrap items-center justify-center">
-        <h2>End Time</h2>
+      <div
+        class="flex w-40 flex-col flex-nowrap items-center justify-start justify-center gap-2"
+      >
+        <h2 class="mt-0! place-self-start">End Time</h2>
         <input type="time" id="end" />
+        <div class="*:text-center">
+          {{ partial "form-feedback" (dict "Id" "end") }}
+        </div>
       </div>
     </div>
 
     <h2>Status</h2>
-    <select id="status">
-      <option value="tentative">Tentative</option>
-      <option value="confirmed" selected>Confirmed</option>
-    </select>
+    <div>
+      <select id="status">
+        <option value="confirmed" selected>Confirmed</option>
+        <option value="tentative">Tentative</option>
+      </select>
+      {{ partial "form-feedback" (dict "Id" "status") }}
+    </div>
 
     <h2>Description</h2>
     <textarea id="description" placeholder="About this event..."></textarea>
+    {{ partial "form-feedback" (dict "Id" "description") }}
+
 
     <div class="flex flex-row flex-nowrap justify-center gap-3">
       <a
@@ -57,8 +80,9 @@
         >Cancel</a
       >
       <a
-        class="button cursor-pointer bg-(--legacy-color-green-40) text-white hover:bg-(--legacy-color-green-35)"
-        >Save</a
+        id="create"
+        class="button bg-(--legacy-color-green-40) hover:bg-(--legacy-color-green-35) cursor-pointer text-white"
+        >Create</a
       >
     </div>
   </main>

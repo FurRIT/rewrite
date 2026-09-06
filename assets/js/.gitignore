@@ -4,4 +4,9 @@
 !*.ts
 !api.schema.d.ts
 
+!toast/
+
+!utils/
+
+!page/
 !search/

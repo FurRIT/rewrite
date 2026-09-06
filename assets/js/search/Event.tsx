@@ -76,7 +76,7 @@ export default function Event(props: { event: DetailedEvent }) {
   return (
     <a class="mx-auto block w-full rounded-xl bg-white pb-3" href={eventUrl}>
       <div class="pl-3 [&>*]:mb-1">
-        <h3 class="mx-auto pt-1">{props.event.summary}</h3>
+        <h3 class="mx-auto pt-1">{props.event.title}</h3>
         <EventTime {...props.event} />
         <p>
           {locationEmoji} {locationText}

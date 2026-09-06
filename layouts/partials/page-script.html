@@ -1,31 +1,23 @@
-{{/* A search script for an entity.
+{{/* A page-specific TS/JS file.
 
-  .Entity - The API search entity (e.g. user; -> /api/users).
+  .Name - The page name (e.g. event-new); derived from .File.BaseFileName.
 */}}
 
-{{ $entity := .Entity }}
-{{ $apiUrl := absURL (print "/api/" .Entity "s") }}
 {{ $apiBase := absURL "/api" }}
 {{ $siteBase := absURL "" }}
 
 {{ if hugo.IsDevelopment }}
-  {{ $apiUrl = (print "http://localhost:8000/api/" .Entity "s") }}
+  {{ $apiBase = (print "http://localhost:8000/api/") }}
 {{ end }}
 
-{{ if hugo.IsDevelopment }}
-  {{ $apiBase = (print "http://localhost:8000/api") }}
-{{ end }}
-
-{{ with resources.Get "js/search.ts" }}
+{{ with resources.Get (print "js/page/" .Name ".ts") }}
   {{ $opts := dict
-    "shims" (dict "component" (print "js/search/" ($entity | strings.FirstUpper) ".tsx"))
-    "params" (dict "url" $apiUrl "entity" $entity "apiBase" $apiBase "siteBase" $siteBase)
+    "params" (dict "apiBase" $apiBase "siteBase" $siteBase)
     "minify" (cond hugo.IsDevelopment false true)
     "sourceMap" (cond hugo.IsDevelopment "linked" "none")
     "inject" (slice "js/jsx-inject.ts")
     "JSX" "transform"
     "JSXFactory" "createElement"
-    "targetPath" (print "js/search-" $entity ".js")
   }}
   {{ with . | js.Build $opts }}
     {{ if hugo.IsDevelopment }}

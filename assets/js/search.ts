@@ -1,3 +1,5 @@
+import { tryGetElementOfTypeById } from "./utils/dom.ts";
+
 type SearchableEntityName = "user" | "event";
 type SearchableEntityNamePlural = `${SearchableEntityName}s`;
 
@@ -67,22 +69,21 @@ async function onSearchSubmit(
 }
 
 async function setup(): Promise<void> {
-  const queryTextbox = document.getElementById("query");
-  const resultsContainer = document.getElementById("search-results");
-  const searchSubmitButton = document.getElementById("search-submit");
+  const queryTextbox = tryGetElementOfTypeById("query", HTMLInputElement);
+  const resultsContainer = tryGetElementOfTypeById(
+    "search-results",
+    HTMLElement,
+  );
+  const searchSubmitButton = tryGetElementOfTypeById(
+    "search-submit",
+    HTMLElement,
+  );
 
   if (
     queryTextbox === null || searchSubmitButton === null ||
     resultsContainer === null
   ) {
     console.error("failed to load search DOM elements");
-    return;
-  }
-
-  if (!(queryTextbox instanceof HTMLInputElement)) {
-    console.error(
-      'query text box (id="query") does not match expected type HTMLInputElement',
-    );
     return;
   }
 
@@ -100,4 +101,5 @@ async function setup(): Promise<void> {
   await searchRender(null, resultsContainer);
 }
 
+// deno-lint-ignore no-window no-window-prefix
 window.addEventListener("load", setup);

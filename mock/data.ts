@@ -173,6 +173,7 @@ export type User = {
   telegramUsername: string;
   sonas: { name: string; species: string }[];
   socials: { platform: string; handle: string }[];
+  me: boolean;
 };
 
 export type Rsvp = {
@@ -184,7 +185,7 @@ export type Rsvp = {
 export type Event = {
   id: string;
   description: string;
-  summary: string;
+  title: string;
   location: string;
   status: "canceled" | "tentative" | "confirmed";
   dtstart: string;
@@ -209,9 +210,11 @@ function randomchoice<T>(...items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-type UserWithoutProfilePicture = Omit<User, "profilePicture">;
+type UserWithoutProfilePictureOrMe = Omit<User, "profilePicture" | "me">;
 
-function randomUser(): UserWithoutProfilePicture {
+type UserWithoutMe = Omit<User, "me">;
+
+function randomUser(): UserWithoutProfilePictureOrMe {
   return {
     "id": uuidv4(),
     "name": faker.person.firstName(),
@@ -269,7 +272,7 @@ function randomUser(): UserWithoutProfilePicture {
 async function randomUserProfilePicture(
   mediaPath: string,
 ): Promise<string> {
-  const url = faker.image.urlPicsumPhotos({ width: 256, height: 256 });
+  const url = faker.image.avatarGitHub();
 
   const response = await fetch(url);
   assert(response.ok && response.body !== null);
@@ -344,7 +347,7 @@ function randomEvent(usersMap: Record<string, User>): Event {
     rsvps.push(randomRsvp());
   }
 
-  const summary = capitalize(faker.word.adjective()) + " " +
+  const title = capitalize(faker.word.adjective()) + " " +
     capitalize(faker.word.verb()) +
     randomchoice(" At The ", " Near The ", " By The ") +
     capitalize(faker.word.noun());
@@ -352,7 +355,7 @@ function randomEvent(usersMap: Record<string, User>): Event {
   return {
     "id": uuidv4(),
     "description": faker.lorem.paragraph(),
-    "summary": summary,
+    "title": title,
     "location": randomchoice(() => "online", faker.location.streetAddress)(),
     "status": faker.helpers.arrayElement([
       "canceled",
@@ -388,7 +391,7 @@ async function main() {
   const usersMap: Record<string, User> = {};
   const events: Event[] = [];
 
-  const userPartials: UserWithoutProfilePicture[] = [];
+  const userPartials: UserWithoutProfilePictureOrMe[] = [];
 
   for (let i = 0; i < N_RANDOM_USERS; i++) {
     const partial = randomUser();
@@ -396,17 +399,25 @@ async function main() {
   }
 
   async function fetchProfilePicture(
-    partial: UserWithoutProfilePicture,
-  ): Promise<User> {
+    partial: UserWithoutProfilePictureOrMe,
+  ): Promise<UserWithoutMe> {
     assert(flags.media !== null);
 
     const profilePicture = await randomUserProfilePicture(flags.media);
     return { ...partial, profilePicture };
   }
 
-  const users = await Promise.all(
+  const usersWithoutMe = await Promise.all(
     userPartials.map((partial) => fetchProfilePicture(partial)),
   );
+
+  const meIndex = faker.number.int({ min: 0, max: usersWithoutMe.length - 1 });
+  const users = usersWithoutMe.map(
+    (userWithoutMe: UserWithoutMe, index: number): User => {
+      return { ...userWithoutMe, me: index === meIndex };
+    },
+  );
+
   for (const user of users) {
     usersMap[user.id] = user;
   }

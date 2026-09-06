@@ -18,6 +18,10 @@
       {{ partial "search-script" (dict "Entity" .Params.search.entity) }}
     {{ end }}
 
+    {{ if .Params.script }}
+      {{ partial "page-script" (dict "Name" .File.BaseFileName) }}
+    {{ end }}
+
     {{ with resources.Get "css/fonts.css" }}
       {{ if hugo.IsDevelopment }}
         <link rel="stylesheet" href="{{ .RelPermalink }}" />

@@ -522,7 +522,7 @@ paths:
                   - ok: true
                     events:
                       - id: "03233c03-ab02-47cb-be73-72ec97a976c4"
-                        summary: "Game Awards 2026 Watch Party!"
+                        title: "Game Awards 2026 Watch Party!"
                         location: "online"
                         status: "confirmed"
                         dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
@@ -560,7 +560,7 @@ paths:
               $ref: "#/components/schemas/SparseEventInfo"
               examples:
                 - description: "Time for all of us to get together and watch! Make sure to minimize mic noise!"
-                  summary: "Game Awards 2026 Watch Party!"
+                  title: "Game Awards 2026 Watch Party!"
                   location: "online"
                   status: "confirmed"
                   dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
@@ -632,7 +632,7 @@ paths:
                     event:
                       id: "03233c03-ab02-47cb-be73-72ec97a976c4"
                       description: "Time for all of us to get together and watch! Make sure to minimize mic noise!"
-                      summary: "Game Awards 2026 Watch Party!"
+                      title: "Game Awards 2026 Watch Party!"
                       location: "online"
                       status: "confirmed"
                       dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
@@ -701,7 +701,7 @@ paths:
                     event:
                       id: "03233c03-ab02-47cb-be73-72ec97a976c4"
                       description: "Watch party time!"
-                      summary: "Game Awards 2026 Watch Party!"
+                      title: "Game Awards 2026 Watch Party!"
                       location: "online"
                       status: "confirmed"
                       dtstart: "2026-12-10T12:15:00.000000096-04:00[America/New_York]"
@@ -1200,16 +1200,17 @@ components:
       description: Sparse Event information.
       type: object
       properties:
-        summary:
+        title:
           type: string
           format: ".*"
+          minLength: 1
         location:
           oneOf:
-            - type: "null"
             - type: string
               const: "online"
             - type: string
               format: ".*"
+              minLength: 1
         status:
           type: string
           enum: [canceled, tentative, confirmed]
@@ -1222,12 +1223,14 @@ components:
           format: date-time
           description: An RFC 9557 format string.
         description:
-          type: [string, "null"]
+          type: string
           format: ".*"
       required:
-        - summary
+        - title
         - location
         - status
+        - dtstart
+        - dtend
         - description
     PartialSparseEventInfo:
       description: SparseEventInfo with no required fields.
