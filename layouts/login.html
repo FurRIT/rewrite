@@ -5,7 +5,7 @@
 
   <main class="page-box-small white-main-box body-text">
     <div
-      class="mt-2 mb-5 flex w-full flex-col flex-nowrap content-center [&_*]:text-lg [&>*]:mb-5 [&>*:last-child]:mb-0"
+      class="mb-5 mt-2 flex w-full flex-col flex-nowrap content-center [&>*:last-child]:mb-0 [&>*]:mb-5 [&_*]:text-lg"
     >
       {{ partial "textbox" (dict "Id" "username" "Type" "text" "Placeholder" "Username" "Class" "block") }}
       {{ partial "textbox" (dict "Id" "password" "Type" "password" "Placeholder" "Password" "Class" "block") }}
@@ -21,7 +21,7 @@
     <div class="mx-auto flex flex-nowrap items-center justify-center">
       <button
         id="login-button"
-        class="button cursor-pointer bg-(--legacy-color-green-40) text-white hover:bg-(--legacy-color-green-35)"
+        class="button bg-(--legacy-color-green-40) hover:bg-(--legacy-color-green-35) cursor-pointer text-white"
       >
         Login
       </button>
