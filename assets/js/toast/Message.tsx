@@ -52,8 +52,6 @@ function animateProgress(
     const progress = Math.min(elapsed / duration, 1);
     element.value = progress;
 
-    console.log(progress);
-
     if (progress < 1) {
       requestAnimationFrame(step);
     } else {
