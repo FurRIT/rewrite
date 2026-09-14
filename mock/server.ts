@@ -371,6 +371,40 @@ function makeHandler(ctx: HandlerCtx): (req: Request) => Promise<Response> {
     },
   );
 
+  servemux.addPath(
+    "POST",
+    "/session",
+    async (req: Request): Promise<Response> => {
+      type PostLogin =
+        paths["/session"]["post"]["requestBody"]["content"]["application/json"];
+      type Response = paths["/session"]["post"]["responses"]["201"]["content"][
+        "application/json"
+      ];
+
+      const reqbody: PostLogin = await req.json();
+
+      let found = null;
+      for (const user of Object.values(ctx.users)) {
+        if (
+          user.username === reqbody.username &&
+          user.password === reqbody.password
+        ) {
+          found = user;
+        }
+      }
+
+      if (found === null) {
+        return errorResponse(403);
+      }
+
+      const respbody: Response = { ok: true };
+      return new Response(JSON.stringify(respbody), {
+        headers: { ...CORS_HEADERS },
+        status: 201,
+      });
+    },
+  );
+
   return servemux.intoHandler(metadata);
 }
 
