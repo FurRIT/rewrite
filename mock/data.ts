@@ -164,6 +164,7 @@ const RIT_DEGREES = [
 ];
 
 export type User = {
+  // Closely related to data model.
   id: string;
   name: string;
   degrees: string[];
@@ -173,7 +174,10 @@ export type User = {
   telegramUsername: string;
   sonas: { name: string; species: string }[];
   socials: { platform: string; handle: string }[];
+  // Management/mocking related.
   me: boolean;
+  username: string;
+  password: string;
 };
 
 export type Rsvp = {
@@ -266,6 +270,8 @@ function randomUser(): UserWithoutProfilePictureOrMe {
         "handle": faker.internet.username(),
       },
     ],
+    "username": faker.internet.username(),
+    "password": faker.internet.password(),
   };
 }
 
